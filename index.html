@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Sudokinho</title>
+        <link rel="stylesheet" href="style.css">
+        <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400&display=swap" rel="stylesheet">
+    </head>
+    <body>
+        <div class="container">
+            <div class="header-container">
+                <h1>SUDOKINHO</h1>
+                <button id="play-button">🎵</button>
+                <div id="timer">00:00</div>
+            </div>
+            <div id="sudoku-grid"></div>
+            <div class="footer-container">
+                <button id="new-game-button">Novo Jogo</button>
+                <button id="solve-button">Resolver</button>
+            </div>
+        </div>
+
+        <div id="customModal" class="custom-modal">
+            <div class="modal-content">
+                <h3 class="modal-title" id="modalTitle"></h3>
+                <p class="modal-message" id="modalMessage"></p>
+                <button class="modal-button" id="modalButton"></button>
+            </div>
+        </div>
+
+        <audio id="audio-player" loop autoplay style="display: none;">
+            <source src="midia/music.mp3" type="audio/mp3">
+            Seu navegador não suporta o elemento de áudio.
+        </audio>
+
+        <script src="script.js"></script>
+    </body>
+</html>
