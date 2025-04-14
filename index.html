@@ -4,6 +4,7 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Sudokinho</title>
+        <link rel="icon" href="icon.ico" type="image/x-icon">
         <link rel="stylesheet" href="style.css">
         <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400&display=swap" rel="stylesheet">
     </head>
@@ -11,8 +12,8 @@
         <div class="container">
             <div class="header-container">
                 <h1>SUDOKINHO</h1>
-                <button id="play-button">🎵</button>
-                <div id="timer">00:00</div>
+                <button id="play-button" aria-label="Tocar música">🎵</button>
+                <div id="timer" aria-label="Tempo">00:00</div>
             </div>
             <div id="sudoku-grid"></div>
             <div class="footer-container">
@@ -25,7 +26,7 @@
             <div class="modal-content">
                 <h3 class="modal-title" id="modalTitle"></h3>
                 <p class="modal-message" id="modalMessage"></p>
-                <button class="modal-button" id="modalButton"></button>
+                <button class="modal-button" id="modalButton">OK</button>
             </div>
         </div>
 
