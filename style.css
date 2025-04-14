@@ -149,6 +149,12 @@ h1:hover {
   box-shadow: 0 0 0 2px var(--primary-color);
 }
 
+.invalid {
+  background-color: #f88;
+  border: 2px solid #c00;
+}
+
+
 /* Melhorias para mobile */
 @media (max-width: 480px) {
   .cell.selected {

@@ -257,7 +257,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function isCurrentBoardValid() {
         const board = getCurrentBoardState();
-    
+        // Verifica se o tabuleiro atual é válido
         for (let row = 0; row < SIZE; row++) {
             for (let col = 0; col < SIZE; col++) {
                 const num = board[row][col];
@@ -318,11 +318,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function getCurrentBoardState() {
         const board = createEmptyBoard();
-        cells.forEach((cell, i) => {
+        for (let i = 0; i < cells.length; i++) {
+            const value = parseInt(cells[i].value);
             const row = Math.floor(i / SIZE);
             const col = i % SIZE;
-            board[row][col] = cell.value ? parseInt(cell.value) : 0;
-        });
+            board[row][col] = isNaN(value) ? 0 : value;
+        }
         return board;
     }
 
