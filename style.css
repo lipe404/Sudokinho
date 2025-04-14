@@ -1,15 +1,38 @@
 :root {
+  /* Cores principais do jogo */
   --primary-color: #5b1fa8;
   --secondary-color: #8436c7;
   --light-purple: #d8a4ff;
   --dark-purple: #3a136b;
+  /* Cores de feedback */
+  --sucess-color: #4caf50
+  --error-color: #f44336;
+  --warning-color: #ff9800;
+  --info-color: #2196f3;
+  /* Cores auxiliares */
   --yellow: #ffcc00;
   --light-yellow: #ffde59;
   --white: #ffffff;
+  --black: #222222;
+  --gray: #e0e0e0;
+  /* Cores de células */
   --cell-bg: #f0e5ff;
+  --cell-fixed-bg: #e6d9ff;
+  --cell-selected-bg: rgba(33, 150, 243, 0.5);
+  --cell-highlight-bg: #e1c8ff;
+  /* Sombras */
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.2);
+  --shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.3);
+  /* Transições */
+  --transition-fast: 0.15s ease;
+  --transition-normal: 0.3s ease;
+  --transition-slow: 0.5s ease;
 }
 
-* {
+*,
+*::before,
+*::after {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
@@ -23,60 +46,72 @@ body {
   min-height: 100vh;
   margin: 0;
   padding: 10px;
-  background: 
-      linear-gradient(135deg,  
-          var(--primary-color) 0%,    
-          var(--secondary-color) 35%,    
-          #a64de0 65%,    
-          var(--light-purple) 100%);
-  background-size: cover, contain;
+  background: linear-gradient(135deg,
+    var(--primary-color) 0%,
+    var(--secondary-color) 35%,
+    #a64de0 65%,
+    var(--light-purple) 100%);
   background-attachment: fixed;
-  overflow-x: hidden;
+  color: var(--black);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
 }
 
+/*Container principal*/
 .container {
   text-align: center;
   width: 100%;
   max-width: 600px;
   padding: 0;
+  margin: 0 auto;
+}
+
+/* Cabeçalho */
+.header-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
 }
 
 h1 {
   font-size: clamp(1.5rem, 5vw, 2.5rem);
-  padding: 15px;
-  margin: 0 auto;
+  padding: 0.75rem 1.5rem;
+  margin: 0;
   border-radius: 20px;
   border: 2px solid var(--primary-color);
-  background-color: rgba(240, 229, 255, 0.9);
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
-  font-family: 'Arial', sans-serif;
+  background-color: rgba(240, 229, 255, 0.95);
   color: var(--primary-color);
-  transition: transform 0.3s ease, background-color 0.3s ease;
-  max-width: 95%;
-  -webkit-border-radius: 20px;
-  -moz-border-radius: 20px;
-  -ms-border-radius: 20px;
-  -o-border-radius: 20px;
+  text-shadow: var(--shadow-sm);
+  font-weight: 700;
+  transition: transform var(--transition-normal),     background-color var(--transition-normal);
+  -webkit-transition: transform var(--transition-normal),     background-color var(--transition-normal);
+  -moz-transition: transform var(--transition-normal),     background-color var(--transition-normal);
+  -ms-transition: transform var(--transition-normal),     background-color var(--transition-normal);
+  -o-transition: transform var(--transition-normal),     background-color var(--transition-normal);
 }
 
 h1:hover {
   transform: scale(1.02);
-  background-color: rgba(240, 229, 255, 1);
+  background-color: var(--white);
 }
 
+/* Grade do Sudoku*/
 #sudoku-grid {
   display: grid;
   grid-template-columns: repeat(9, 1fr);
   grid-template-rows: repeat(9, 1fr);
   gap: 1px;
-  margin: 20px auto;
+  margin: 1.5rem auto;
   border: 4px solid var(--dark-purple);
   border-radius: 10px;
   background-color: var(--dark-purple);
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.5);
+  box-shadow: var(--shadow-lg);
   padding: 4px;
   width: calc(100vw - 40px);
-  max-width: min(95vh, 95vw);
+  width: min(calc(100vw - 2rem), calc(95vh - 10rem));
   aspect-ratio: 1/1;
 }
 
@@ -85,12 +120,12 @@ h1:hover {
   aspect-ratio: 1;
   text-align: center;
   font-size: clamp(1rem, 4vw, 1.8rem);
-  border: 1px solid #ccc;
+  border: 1px solid var(--gray);
   background-color: var(--white);
-  transition: all 0.3s ease;
   border-radius: 2px;
-  font-weight: bold;
-  color: #333;
+  font-weight: 700;
+  color: var(--black);
+  transition: all var(--transition-normal);
 }
 
 .cell::-webkit-outer-spin-button,
@@ -118,18 +153,21 @@ h1:hover {
 }
 
 .cell.fixed {
-  background-color: var(--cell-bg);
+  background-color: var(--cell-fixed-bg);
   color: var(--dark-purple);
-  font-weight: bolder;
+  font-weight: 800;
 }
 
 .cell.selected {
-  background-color: rgba(33, 150, 243, 0.5) !important;
+  background-color: var(--cell-selected-bg);
   transform: scale(1.02);
-  transition: all 0.2s ease;
   box-shadow: 0 0 8px var(--light-purple), 0 0 15px var(--light-purple);
   z-index: 1;
-  position: relative;
+}
+
+.cell:focus-visible {
+  outline: 3px solid var(--dark-purple);
+  outline-offset: 2px;
 }
 
 .cell:focus {
@@ -138,8 +176,7 @@ h1:hover {
 }
 
 .cell.highlight {
-  background-color: var(--cell-bg);
-  box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.7);
+  background-color: var(--cell-highlight-bg);
 }
 
 .cell.highlight-fixed {
@@ -147,11 +184,41 @@ h1:hover {
   box-shadow: 0 0 0 2px var(--primary-color);
 }
 
-.invalid {
-  background-color: #f88;
-  border: 2px solid #c00;
+.cell.invalid {
+  background-color: var(--error-color);
+  color: var(--white);
+  animation: shake 0.5s;
 }
 
+/* Botões */
+.button {
+  padding: 0.75rem 1.5rem;
+  font-size: clamp(1rem, 4vw, 1.2rem);
+  color: var(--white);
+  background-color: var(--primary-color);
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all var(--transition-normal);
+  box-shadow: var(--shadow-md);
+  font-weight: 600;
+}
+
+.button:hover, 
+.button:focus-visible {
+  background-color: var(--secondary-color);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+}
+
+.button:active {
+  transform: translateY(0);
+}
+
+.button.secondary {
+  background-color: var(--yellow);
+  color: var(--black);
+}
 
 /* Melhorias para mobile */
 @media (max-width: 480px) {
@@ -166,8 +233,9 @@ h1:hover {
 
 /* ===== BOTÃO NOVO JOGO ===== */
 #new-game-button,
-#solve-button {
-  margin: 10px auto;
+#solve-button,
+#hint-button {
+  margin: 0px;
   padding: 12px 6px;
   font-size: clamp(1rem, 4vw, 1.2rem);
   color: var(--white);
@@ -183,40 +251,45 @@ h1:hover {
 }
 
 #new-game-button:hover,
-#solve-button:hover {
+#solve-button:hover,
+#hint-button:hover {
   box-shadow: 0 0 12px var(--primary-color);
   background-color: var(--secondary-color);
   transform: scale(1.05);
 }
 
 .custom-modal {
-  display: none;
   position: fixed;
-  z-index: 1000;
-  left: 0;
   top: 0;
-  width: 100%;
-  height: 100%;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1000;
+  display: none;
+  justify-content: center;
+  align-items: center;
   background-color: rgba(91, 31, 168, 0.7);
   backdrop-filter: blur(8px);
-  animation: fadeIn 0.4s ease-out;
+  animation: fadeIn var(--transition-normal);
 }
 
 .modal-content {
-  background: linear-gradient(145deg,
-      rgba(91, 31, 168, 0.95) 0%,
-      rgba(132, 54, 199, 0.95) 50%,
-      rgba(166, 77, 224, 0.9) 100%);
-  margin: 10vh auto;
-  padding: 25px;
+  background: linear-gradient(
+    145deg,
+    rgba(91, 31, 168, 0.95) 0%,
+    rgba(132, 54, 199, 0.95) 50%,
+    rgba(166, 77, 224, 0.9) 100%
+  );
+  padding: 1.5rem;
   border-radius: 15px;
-  width: 90%;
-  max-width: 380px;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+  width: min(90%, 380px);
+  box-shadow: var(--shadow-lg);
   color: var(--white);
   text-align: center;
-  animation: slideIn 0.4s ease-out;
+  animation: slideIn var(--transition-normal);
 }
+
+
 
 .modal-button {
   background: linear-gradient(135deg,
@@ -241,6 +314,19 @@ h1:hover {
 @keyframes slideIn {
   from { transform: translateY(20px); opacity: 0; }
   to { transform: translateY(0); opacity: 1; }
+}
+
+/* Acessibilidade */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
 }
 
 /* ===== MEDIA QUERIES ===== */
@@ -307,22 +393,20 @@ h1:hover {
   transform: scale(1.05);
 }
 
+#pause-button {
+  padding: 0.75rem;
+  min-width: 3rem;
+}
+
 #timer {
-  margin-left: 5px;
-  padding: 12px 24px;
+  padding: 0.75rem 1.5rem;
   font-size: clamp(1rem, 4vw, 1.2rem);
   color: var(--white);
   background-color: var(--primary-color);
-  border: none;
   border-radius: 20px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-  font-family: 'Noto Sans JP', sans-serif;
-  font-weight: bold;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 80px;
-  transition: all 0.3s ease;
+  box-shadow: var(--shadow-md);
+  font-weight: 700;
+  transition: all var(--transition-normal);
 }
 
 #timer:hover {
@@ -332,6 +416,9 @@ h1:hover {
 
 .footer-container {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: center;
+  gap: 1rem;
+  margin-top: 1.5rem;
 }

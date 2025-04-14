@@ -1,28 +1,53 @@
 <!DOCTYPE html>
 <html lang="pt-br">
     <head>
+        <!--Meta tags essenciais-->
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="description" content="Sudokinho - Um jogo de Sudoku divertido e desafiador.">
+        <meta name="keywords" content="Sudoku, jogo, puzzle, diversão">
+        <meta name="author" content="Felipe Toledo">
+        <meta name="theme-color" content="#8436c7">
+
+        <!--Título e ícone-->
         <title>Sudokinho</title>
         <link rel="icon" href="icon.ico" type="image/x-icon">
+
+        <!--Estilos e fontes-->
         <link rel="stylesheet" href="style.css">
         <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400&display=swap" rel="stylesheet">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     </head>
     <body>
+        <!--Conteúdo principal-->
         <div class="container">
+            <!--Cabeçalho-->
             <div class="header-container">
                 <h1>SUDOKINHO</h1>
-                <button id="play-button" aria-label="Tocar música">🎵</button>
-                <div id="timer" aria-label="Tempo">00:00</div>
+                <div class="audio-controls">
+                    <button id="play-button" aria-label="Tocar música" aria-pressed="false">
+                        <span class="play-icon">🎵</span>
+                    </button>
+                    <button id="pause-button" aria-label="Pausar música" style="display: none;">
+                        <span class="mute-icon">🔇</span>
+                </div>
+                <!--Temporizador-->
+                <div id="timer" aria-label="Tempo" role="timer">00:00</div>
             </div>
+
+            <!--Grade do Sudoku-->
             <div id="sudoku-grid"></div>
+
+            <!--Controles do jogo-->
             <div class="footer-container">
-                <button id="new-game-button">Novo Jogo</button>
-                <button id="solve-button">Resolver</button>
+                <button id="new-game-button" aria-label="Novo Jogo">Novo Jogo</button>
+                <button id="solve-button" aria-label="Resolver o Sudoku">Resolver</button>
+                <button id="hint-button" aria-label="Obter uma dica" class="secondary-button">Dica</button>
             </div>
         </div>
 
-        <div id="customModal" class="custom-modal">
+        <!--Modal de mensagem-->
+        <div id="customModal" class="custom-modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle" aria-describedby="modalMessage">
             <div class="modal-content">
                 <h3 class="modal-title" id="modalTitle"></h3>
                 <p class="modal-message" id="modalMessage"></p>
@@ -30,11 +55,14 @@
             </div>
         </div>
 
+        <!--Elemento do aúdio-->
         <audio id="audio-player" loop autoplay style="display: none;">
             <source src="midia/music.mp3" type="audio/mp3">
             Seu navegador não suporta o elemento de áudio.
         </audio>
 
         <script src="script.js"></script>
+
+        <div class="sr-only" aria-live="polite" id="a11y-announcement"></div>
     </body>
 </html>
