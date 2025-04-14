@@ -91,8 +91,6 @@ h1:hover {
   border-radius: 2px;
   font-weight: bold;
   color: #333;
-  -webkit-appearance: none;
-  -moz-appearance: textfield;
 }
 
 .cell::-webkit-outer-spin-button,
@@ -205,9 +203,9 @@ h1:hover {
 }
 
 .modal-content {
-  background: linear-gradient(145deg, 
-      rgba(91, 31, 168, 0.95) 0%, 
-      rgba(132, 54, 199, 0.95) 50%, 
+  background: linear-gradient(145deg,
+      rgba(91, 31, 168, 0.95) 0%,
+      rgba(132, 54, 199, 0.95) 50%,
       rgba(166, 77, 224, 0.9) 100%);
   margin: 10vh auto;
   padding: 25px;
@@ -221,8 +219,8 @@ h1:hover {
 }
 
 .modal-button {
-  background: linear-gradient(135deg, 
-  var(--primary-color) 0%, 
+  background: linear-gradient(135deg,
+  var(--primary-color) 0%,
   var(--primary-color) 100%);
   color: var(--primary-color);
   border: none;
