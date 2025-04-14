@@ -42,7 +42,6 @@ document.addEventListener("DOMContentLoaded", () => {
         setupNewGameButton();
         setupHintButton();
         setupAudioControls();
-        startTimer();
     }
     //Controles de Áudio
     function setupAudioControls() {
@@ -175,7 +174,6 @@ document.addEventListener("DOMContentLoaded", () => {
         clearInterval(timerInterval);
         clearAllCells();
         generateSudoku(); // Gera o jogo com a dificuldade atual
-        startTimer(); // Reinicia o timer
     }
     // Lógica para resolver o Sudoku atual
     function solveCurrentSudoku() {
@@ -271,6 +269,7 @@ document.addEventListener("DOMContentLoaded", () => {
             currentDifficulty = DIFFICULTY_LEVELS[difficulty];
             difficultyModal.style.display = 'none';
             resetGame(); // Inicia o jogo com a dificuldade selecionada
+            startTimer(); // Inicia o timer após a seleção da dificuldade
             newGameButton.disabled = false;
         }
     }
