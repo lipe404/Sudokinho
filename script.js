@@ -18,6 +18,13 @@ document.addEventListener("DOMContentLoaded", () => {
     const audioPlayer = document.getElementById('audio-player');
     const playButton = document.getElementById('play-button');
     const pauseButton = document.getElementById('pause-button');
+    // Níveis de dificuldade
+    const DIFFICULTY_LEVELS = {
+        easy: { min: 30, max: 40, name: "Fácil" },
+        medium: { min: 40, max: 50, name: "Médio" },
+        hard: { min: 50, max: 60, name: "Difícil" }
+    };
+    let currentDifficulty = DIFFICULTY_LEVELS.medium; // Dificuldade padrão
     // Estado do jogo
     const cells = [];
     let currentBoard = createEmptyBoard();
@@ -31,7 +38,6 @@ document.addEventListener("DOMContentLoaded", () => {
     function initGame() {
         setupModal();
         createGrid();
-        generateSudoku();
         setupSolveButton();
         setupNewGameButton();
         setupHintButton();
@@ -155,7 +161,9 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     // Configuração do botão Novo Jogo
     function setupNewGameButton() {
-        newGameButton.addEventListener("click", resetGame);
+        newGameButton.addEventListener("click", () => {
+            showDifficultyModal();
+        });
     }
     // Configuração do botão de resolver
     function setupSolveButton() {
@@ -164,10 +172,8 @@ document.addEventListener("DOMContentLoaded", () => {
     // Função para resetar o jogo
     function resetGame() {
         clearInterval(timerInterval);
-        generateSudoku();
-        startTimer();
-        modal.style.display = "none";
-        lastHintTime = 0; // Resetar o timer de dicas
+        generateSudoku(); // Gera o jogo com a dificuldade atual
+        startTimer(); // Reinicia o timer
     }
     // Lógica para resolver o Sudoku atual
     function solveCurrentSudoku() {
@@ -195,8 +201,8 @@ document.addEventListener("DOMContentLoaded", () => {
         fillBoard(currentBoard);
         // Criar uma cópia para a solução
         solutionBoard = currentBoard.map(row => [...row]);
-        // Remover números para criar o tabuleiro jogável
-        removeNumbers(currentBoard);
+        // Remover números para criar o tabuleiro jogável com base na dificuldade
+        removeNumbers(currentBoard, currentDifficulty); // Note o currentDifficulty aqui
         fillCells(currentBoard);
     }
     // Funções auxiliares do Sudoku
@@ -222,27 +228,47 @@ document.addEventListener("DOMContentLoaded", () => {
         return true;
     }
     // Remover números para criar o tabuleiro jogável
-    function removeNumbers(board) {
-        let cellsToRemove = MIN_REMOVED_CELLS + Math.floor(Math.random() * (MAX_REMOVED_CELLS - MIN_REMOVED_CELLS + 1));
+    function removeNumbers(board, difficulty) {
+        let cellsToRemove = difficulty.min + Math.floor(Math.random() * (difficulty.max - difficulty.min + 1));
         let attempts = 0;
-
+        // Remover células até atingir o número desejado
         while (cellsToRemove > 0 && attempts < MAX_ATTEMPTS) {
             const row = Math.floor(Math.random() * SIZE);
             const col = Math.floor(Math.random() * SIZE);
-
+            // Verifica se a célula não está vazia
             if (board[row][col] !== 0) {
                 const temp = board[row][col];
                 board[row][col] = 0;
-
+                // Verifica se ainda há uma solução única
                 const boardCopy = board.map(row => [...row]);
                 if (countSolutions(boardCopy) === 1) {
                     cellsToRemove--;
                 } else {
                     board[row][col] = temp; // Reverte se não for solução única
                 }
-
                 attempts++;
             }
+        }
+    }
+    // Função para exibir o modal de dificuldade
+    function showDifficultyModal() {
+        const difficultyModal = document.getElementById('difficultyModal');
+        difficultyModal.style.display = 'flex';
+        // Configurar os botões de dificuldade
+        const difficultyButtons = document.querySelectorAll('.difficulty-btn');
+        // Remover event listeners antigos para evitar duplicação
+        difficultyButtons.forEach(button => {
+            button.removeEventListener('click', handleDifficultySelection);
+        });
+        // Adicionar novos event listeners
+        difficultyButtons.forEach(button => {
+            button.addEventListener('click', handleDifficultySelection);
+        });
+        function handleDifficultySelection() {
+            const difficulty = this.getAttribute('data-difficulty');
+            currentDifficulty = DIFFICULTY_LEVELS[difficulty];
+            difficultyModal.style.display = 'none';
+            resetGame(); // Inicia o jogo com a dificuldade selecionada
         }
     }
     // Contar soluções para verificar unicidade
