@@ -180,9 +180,9 @@ document.addEventListener("DOMContentLoaded", () => {
             updateCellsFromBoard(boardToSolve);
             clearInterval(timerInterval);
             const finalTime = document.getElementById('timer').textContent;
-            showCustomAlert("Parabéns Mozi!", `Você completou em ${finalTime}! Você é a melhor!`, "success");
+            showCustomAlert("Parabéns!", `Você completou em ${finalTime}! Você é a melhor!`, "success");
         } else {
-            showCustomAlert("Poxa Mozi", "Tenta de novo aí", "error");
+            showCustomAlert("Poxa", "Tenta de novo aí", "error");
         }
     }
     // Geração de um novo Sudoku
