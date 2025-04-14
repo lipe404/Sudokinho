@@ -162,6 +162,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // Configuração do botão Novo Jogo
     function setupNewGameButton() {
         newGameButton.addEventListener("click", () => {
+            newGameButton.disabled = true;
             showDifficultyModal();
         });
     }
@@ -172,6 +173,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // Função para resetar o jogo
     function resetGame() {
         clearInterval(timerInterval);
+        clearAllCells();
         generateSudoku(); // Gera o jogo com a dificuldade atual
         startTimer(); // Reinicia o timer
     }
@@ -269,18 +271,20 @@ document.addEventListener("DOMContentLoaded", () => {
             currentDifficulty = DIFFICULTY_LEVELS[difficulty];
             difficultyModal.style.display = 'none';
             resetGame(); // Inicia o jogo com a dificuldade selecionada
+            newGameButton.disabled = false;
         }
     }
     // Contar soluções para verificar unicidade
     function countSolutions(board, count = 0) {
+        if (count >= 2) return count; // Parar se já encontrou mais de uma solução
         for (let row = 0; row < SIZE; row++) {
             for (let col = 0; col < SIZE; col++) {
                 if (board[row][col] === 0) {
-                    for (let num = 1; num <= SIZE && count < 2; num++) {
+                    for (let num = 1; num <= SIZE; num++) {
                         if (isValidPlacement(num, row, col, board)) {
                             board[row][col] = num;
                             count = countSolutions(board, count);
-                            board[row][col] = 0;
+                            board[row][col] = 0; // Backtrack
                         }
                     }
                     return count;
