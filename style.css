@@ -314,7 +314,7 @@ h1:hover {
 
 /* Estilo para células com dica */
 .cell.hint {
-  background-color: var(--light-yellow);
+  background-color: var(--white);
   color: var(--black);
   font-weight: bold;
 }
@@ -427,24 +427,24 @@ h1:hover {
 }
 
 @keyframes hintPulse {
-  0% { transform: scale(1); background-color: var(--light-yellow); }
-  50% { transform: scale(1.1); background-color: var(--yellow); }
-  100% { transform: scale(1); background-color: var(--light-yellow); }
+  0% { transform: scale(1); background-color: #d8a4ff; }
+  50% { transform: scale(1.1); background-color: #e1c8ff; }
+  100% { transform: scale(1); background-color: #d8a4ff; }
 }
 
 /* Animação para células com dicas */
 @keyframes hintPulse {
   0% {
     transform: scale(1);
-    background-color: var(--light-yellow);
+    background-color: #d8a4ff;
   }
   50% {
     transform: scale(1.1);
-    background-color: var(--yellow);
-    box-shadow: 0 0 10px var(--yellow);
+    background-color: #e1c8ff;
+    box-shadow: 0 0 10px #e1c8ff;
   }
   100% {
     transform: scale(1);
-    background-color: var(--light-yellow);
+    background-color: #d8a4ff;
   }
 }

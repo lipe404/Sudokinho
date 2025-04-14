@@ -1,10 +1,10 @@
 document.addEventListener("DOMContentLoaded", () => {
     // Constantes e configurações
-    const SIZE = 9;
-    const SUBGRID_SIZE = 3;
-    const MIN_REMOVED_CELLS = 40;
-    const MAX_REMOVED_CELLS = 49;
-    const MAX_ATTEMPTS = 200;
+    const SIZE = 9; // Tamanho da grade do Sudoku (9x9)
+    const SUBGRID_SIZE = 3; // Tamanho do subgrid (3x3)
+    const MIN_REMOVED_CELLS = 40; // Mínimo de células removidas para criar desafio
+    const MAX_REMOVED_CELLS = 49; // Máximo de células removidas
+    const MAX_ATTEMPTS = 200; // Tentativas para encontrar uma configuração jogável válida
     const HINT_COOL_DOWN = 30000; // 30 segundos entre dicas
     // Elementos DOM
     const grid = document.getElementById("sudoku-grid");
@@ -38,8 +38,7 @@ document.addEventListener("DOMContentLoaded", () => {
         setupAudioControls();
         startTimer();
     }
-
-    // ===== CONTROLES DE ÁUDIO =====
+    //Controles de Áudio
     function setupAudioControls() {
         // Botão Play
         playButton.addEventListener('click', () => {
@@ -66,15 +65,15 @@ document.addEventListener("DOMContentLoaded", () => {
             playButton.style.display = 'none';
         }
     }
-    // ===== CONTROLES DE DICAS =====
+    //Configuração do botão de dica
     function setupHintButton() {
         hintButton.addEventListener('click', provideHint);
     }
     function provideHint() {
         const now = Date.now();
         // Verificar cooldown
-        if (now - lastHintTime < HINT_COOLDOWN) {
-            const remainingTime = Math.ceil((HINT_COOLDOWN - (now - lastHintTime)) / 1000);
+        if (now - lastHintTime < HINT_COOL_DOWN) {
+            const remainingTime = Math.ceil((HINT_COOL_DOWN - (now - lastHintTime)) / 1000);
             showCustomAlert("Aguarde", `Você pode pedir outra dica em ${remainingTime} segundos.`, "info");
             return;
         }
@@ -188,11 +187,14 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     // Geração de um novo Sudoku
     function generateSudoku() {
+        // Criar tabuleiros vazios
         currentBoard = createEmptyBoard();
         solutionBoard = createEmptyBoard();
         clearAllCells();
         // Preencher o tabuleiro com números
         fillBoard(currentBoard);
+        // Criar uma cópia para a solução
+        solutionBoard = currentBoard.map(row => [...row]);
         // Remover números para criar o tabuleiro jogável
         removeNumbers(currentBoard);
         fillCells(currentBoard);
