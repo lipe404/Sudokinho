@@ -1,31 +1,32 @@
 document.addEventListener("DOMContentLoaded", () => {
-
     // Constantes e configurações
     const SIZE = 9;
     const SUBGRID_SIZE = 3;
     const MIN_REMOVED_CELLS = 40;
     const MAX_REMOVED_CELLS = 49;
     const MAX_ATTEMPTS = 200;
-
+    const HINT_COOL_DOWN = 30000; // 30 segundos entre dicas
     // Elementos DOM
     const grid = document.getElementById("sudoku-grid");
     const solveButton = document.getElementById("solve-button");
     const newGameButton = document.getElementById("new-game-button");
+    const hintButton = document.getElementById("hint-button");
     const modal = document.getElementById("customModal");
     const modalButton = document.getElementById("modalButton");
     const modalTitle = document.getElementById("modalTitle");
     const modalMessage = document.getElementById("modalMessage");
     const audioPlayer = document.getElementById('audio-player');
-
+    const playButton = document.getElementById('play-button');
+    const pauseButton = document.getElementById('pause-button');
     // Estado do jogo
     const cells = [];
     let currentBoard = createEmptyBoard();
+    let solutionBoard = createEmptyBoard(); // Armazenar a solução para dicas
     let timerInterval;
     let seconds = 0;
-
+    let lastHintTime = 0; // Controle do tempo entre dicas
     // Inicialização do jogo
     initGame();
-
     // Função principal de inicialização
     function initGame() {
         setupModal();
@@ -33,7 +34,79 @@ document.addEventListener("DOMContentLoaded", () => {
         generateSudoku();
         setupSolveButton();
         setupNewGameButton();
+        setupHintButton();
+        setupAudioControls();
         startTimer();
+    }
+
+    // ===== CONTROLES DE ÁUDIO =====
+    function setupAudioControls() {
+        // Botão Play
+        playButton.addEventListener('click', () => {
+            audioPlayer.play();
+            playButton.style.display = 'none';
+            pauseButton.style.display = 'block';
+            playButton.setAttribute('aria-pressed', 'true');
+            pauseButton.setAttribute('aria-pressed', 'false');
+        });
+        // Botão Pause
+        pauseButton.addEventListener('click', () => {
+            audioPlayer.pause();
+            pauseButton.style.display = 'none';
+            playButton.style.display = 'block';
+            pauseButton.setAttribute('aria-pressed', 'true');
+            playButton.setAttribute('aria-pressed', 'false');
+        });
+        // Atualizar estado inicial
+        if (audioPlayer.paused) {
+            pauseButton.style.display = 'none';
+            playButton.style.display = 'block';
+        } else {
+            pauseButton.style.display = 'block';
+            playButton.style.display = 'none';
+        }
+    }
+    // ===== CONTROLES DE DICAS =====
+    function setupHintButton() {
+        hintButton.addEventListener('click', provideHint);
+    }
+
+    function provideHint() {
+        const now = Date.now();
+        // Verificar cooldown
+        if (now - lastHintTime < HINT_COOLDOWN) {
+            const remainingTime = Math.ceil((HINT_COOLDOWN - (now - lastHintTime)) / 1000);
+            showCustomAlert("Aguarde", `Você pode pedir outra dica em ${remainingTime} segundos.`, "info");
+            return;
+        }
+        // Encontrar células vazias
+        const emptyCells = [];
+        for (let i = 0; i < cells.length; i++) {
+            if (!cells[i].value && !cells[i].disabled) {
+                emptyCells.push(i);
+            }
+        }
+        if (emptyCells.length === 0) {
+            showCustomAlert("Parabéns!", "O tabuleiro já está completo!", "success");
+            return;
+        }
+        // Escolher uma célula aleatória vazia
+        const randomIndex = emptyCells[Math.floor(Math.random() * emptyCells.length)];
+        const cell = cells[randomIndex];
+        const row = Math.floor(randomIndex / SIZE);
+        const col = randomIndex % SIZE;
+        // Preencher com o valor correto da solução
+        cell.value = solutionBoard[row][col];
+        cell.classList.add("hint");
+        // Animar a célula com a dica
+        cell.style.animation = "hintPulse 1.5s";
+        setTimeout(() => {
+            cell.style.animation = "";
+        }, 1500);
+        // Atualizar último tempo de dica
+        lastHintTime = now;
+        // Feedback para o jogador
+        showCustomAlert("Dica", `Número ${solutionBoard[row][col]} adicionado!`, "info");
     }
 
     // Cronômetro
@@ -128,8 +201,11 @@ document.addEventListener("DOMContentLoaded", () => {
     // Geração de um novo Sudoku
     function generateSudoku() {
         currentBoard = createEmptyBoard();
+        solutionBoard = createEmptyBoard();
         clearAllCells();
+        // Preencher o tabuleiro com números
         fillBoard(currentBoard);
+        // Remover números para criar o tabuleiro jogável
         removeNumbers(currentBoard);
         fillCells(currentBoard);
     }
