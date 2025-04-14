@@ -5,7 +5,7 @@
   --light-purple: #d8a4ff;
   --dark-purple: #3a136b;
   /* Cores de feedback */
-  --sucess-color: #4caf50
+  --sucess-color: #4caf50;
   --error-color: #f44336;
   --warning-color: #ff9800;
   --info-color: #2196f3;
@@ -44,8 +44,8 @@ body {
   justify-content: center;
   align-items: center;
   min-height: 100vh;
-  margin: 0;
   padding: 10px;
+  margin: 0;
   background: linear-gradient(135deg,
     var(--primary-color) 0%,
     var(--secondary-color) 35%,
@@ -62,8 +62,8 @@ body {
   text-align: center;
   width: 100%;
   max-width: 600px;
-  padding: 0;
   margin: 0 auto;
+  padding: 0;
 }
 
 /* Cabeçalho */
@@ -86,11 +86,7 @@ h1 {
   color: var(--primary-color);
   text-shadow: var(--shadow-sm);
   font-weight: 700;
-  transition: transform var(--transition-normal),     background-color var(--transition-normal);
-  -webkit-transition: transform var(--transition-normal),     background-color var(--transition-normal);
-  -moz-transition: transform var(--transition-normal),     background-color var(--transition-normal);
-  -ms-transition: transform var(--transition-normal),     background-color var(--transition-normal);
-  -o-transition: transform var(--transition-normal),     background-color var(--transition-normal);
+  transition: transform var(--transition-normal), background-color var(--transition-normal);
 }
 
 h1:hover {
@@ -105,12 +101,11 @@ h1:hover {
   grid-template-rows: repeat(9, 1fr);
   gap: 1px;
   margin: 1.5rem auto;
+  padding: 4px;
   border: 4px solid var(--dark-purple);
   border-radius: 10px;
   background-color: var(--dark-purple);
   box-shadow: var(--shadow-lg);
-  padding: 4px;
-  width: calc(100vw - 40px);
   width: min(calc(100vw - 2rem), calc(95vh - 10rem));
   aspect-ratio: 1/1;
 }
@@ -126,6 +121,49 @@ h1:hover {
   font-weight: 700;
   color: var(--black);
   transition: all var(--transition-normal);
+}
+
+.cell.fixed {
+  background-color: var(--cell-fixed-bg);
+  color: var(--dark-purple);
+  font-weight: 800;
+}
+
+.cell.selected {
+  background-color: var(--cell-selected-bg);
+  transform: scale(1.02);
+  box-shadow: 0 0 8px var(--light-purple), 0 0 15px var(--light-purple);
+  z-index: 1;
+}
+
+.cell.highlight {
+  background-color: var(--cell-highlight-bg);
+}
+
+.cell.highlight-fixed {
+  background-color: var(--primary-color);
+  box-shadow: 0 0 0 2px var(--primary-color);
+}
+
+.cell.invalid {
+  background-color: var(--error-color);
+  color: var(--white);
+  animation: shake 0.5s;
+}
+
+.cell:hover {
+  background-color: var(--cell-bg);
+  border-color: var(--primary-color);
+}
+
+.cell:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--dark-purple);
+}
+
+.cell:focus-visible {
+  outline: 3px solid var(--dark-purple);
+  outline-offset: 2px;
 }
 
 .cell::-webkit-outer-spin-button,
@@ -147,50 +185,32 @@ h1:hover {
   border-bottom: 3px solid var(--dark-purple);
 }
 
-.cell:hover {
-  background-color: var(--cell-bg);
-  border-color: var(--primary-color);
-}
-
-.cell.fixed {
-  background-color: var(--cell-fixed-bg);
-  color: var(--dark-purple);
-  font-weight: 800;
-}
-
-.cell.selected {
-  background-color: var(--cell-selected-bg);
-  transform: scale(1.02);
-  box-shadow: 0 0 8px var(--light-purple), 0 0 15px var(--light-purple);
-  z-index: 1;
-}
-
-.cell:focus-visible {
-  outline: 3px solid var(--dark-purple);
-  outline-offset: 2px;
-}
-
-.cell:focus {
-  outline: none;
-  box-shadow: 0 0 0 3px var(--dark-purple);
-}
-
-.cell.highlight {
-  background-color: var(--cell-highlight-bg);
-}
-
-.cell.highlight-fixed {
-  background-color: var(--primary-color);
-  box-shadow: 0 0 0 2px var(--primary-color);
-}
-
-.cell.invalid {
-  background-color: var(--error-color);
-  color: var(--white);
-  animation: shake 0.5s;
-}
-
 /* Botões */
+#new-game-button,
+#solve-button,
+#hint-button {
+  margin: 0;
+  padding: 12px 6px;
+  font-size: clamp(1rem, 4vw, 1.2rem);
+  color: var(--white);
+  background-color: var(--primary-color);
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all var(--transition-normal);
+  box-shadow: var(--shadow-md);
+  max-width: 200px;
+  display: block;
+}
+
+#new-game-button:hover,
+#solve-button:hover,
+#hint-button:hover {
+  box-shadow: 0 0 12px var(--primary-color);
+  background-color: var(--secondary-color);
+  transform: scale(1.05);
+}
+
 .button {
   padding: 0.75rem 1.5rem;
   font-size: clamp(1rem, 4vw, 1.2rem);
@@ -204,7 +224,7 @@ h1:hover {
   font-weight: 600;
 }
 
-.button:hover, 
+.button:hover,
 .button:focus-visible {
   background-color: var(--secondary-color);
   transform: translateY(-2px);
@@ -220,50 +240,41 @@ h1:hover {
   color: var(--black);
 }
 
-/* Melhorias para mobile */
-@media (max-width: 480px) {
-  .cell.selected {
-      box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.7) !important;
-  }
-
-  .cell.highlight, .cell.highlight-fixed {
-      box-shadow: 0 0 0 1px rgba(0,0,0,0.3);
-  }
-}
-
-/* ===== BOTÃO NOVO JOGO ===== */
-#new-game-button,
-#solve-button,
-#hint-button {
-  margin: 0px;
-  padding: 12px 6px;
+#play-button {
+  margin-left: 15px;
+  padding: 12px 24px;
   font-size: clamp(1rem, 4vw, 1.2rem);
   color: var(--white);
   background-color: var(--primary-color);
   border: none;
-  border-radius: 8px;
+  border-radius: 20px;
   cursor: pointer;
   transition: all 0.3s ease;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-  width: auto;
-  max-width: 200px;
-  display: block;
 }
 
-#new-game-button:hover,
-#solve-button:hover,
-#hint-button:hover {
-  box-shadow: 0 0 12px var(--primary-color);
+#play-button:hover,
+#pause-button:hover {
   background-color: var(--secondary-color);
   transform: scale(1.05);
 }
 
+#pause-button {
+  margin-left: 15px;
+  padding: 12px 24px;
+  font-size: clamp(1rem, 4vw, 1.2rem);
+  color: var(--white);
+  background-color: var(--primary-color);
+  border: none;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
 .custom-modal {
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  inset: 0;
   z-index: 1000;
   display: none;
   justify-content: center;
@@ -289,37 +300,23 @@ h1:hover {
   animation: slideIn var(--transition-normal);
 }
 
-
-
 .modal-button {
-  background: linear-gradient(135deg,
-  var(--primary-color) 0%,
-  var(--primary-color) 100%);
+  background: linear-gradient(135deg, var(--primary-color), var(--primary-color));
   color: var(--primary-color);
   border: none;
   padding: 12px 30px;
   font-size: 1.1rem;
   border-radius: 50px;
   cursor: pointer;
-  transition: all 0.3s ease;
   font-weight: 700;
+  transition: all var(--transition-normal);
 }
 
-/* ===== ANIMAÇÕES ===== */
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-@keyframes slideIn {
-  from { transform: translateY(20px); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
-}
-
-@keyframes hintPulse {
-  0% { transform: scale(1); background-color: var(--light-yellow); }
-  50% { transform: scale(1.1); background-color: var(--yellow); }
-  100% { transform: scale(1); background-color: var(--light-yellow); }
+/* Estilo para células com dica */
+.cell.hint {
+  background-color: var(--light-yellow);
+  color: var(--black);
+  font-weight: bold;
 }
 
 /* Acessibilidade */
@@ -333,6 +330,50 @@ h1:hover {
   clip: rect(0, 0, 0, 0);
   white-space: nowrap;
   border-width: 0;
+}
+
+.header-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+#timer {
+  padding: 0.75rem 1.5rem;
+  font-size: clamp(1rem, 4vw, 1.2rem);
+  color: var(--white);
+  background-color: var(--primary-color);
+  border-radius: 20px;
+  box-shadow: var(--shadow-md);
+  font-weight: 700;
+  transition: all var(--transition-normal);
+}
+
+#timer:hover {
+  background-color: var(--secondary-color);
+  transform: scale(1.05);
+}
+
+.footer-container {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+
+/* Melhorias para mobile */
+@media (max-width: 480px) {
+  .cell.selected {
+      box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.7) !important;
+  }
+
+  .cell.highlight, .cell.highlight-fixed {
+      box-shadow: 0 0 0 1px rgba(0,0,0,0.3);
+  }
 }
 
 /* ===== MEDIA QUERIES ===== */
@@ -374,66 +415,36 @@ h1:hover {
   }
 }
 
-.header-container {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 20px;
+/* ===== ANIMAÇÕES ===== */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
-#play-button {
-  margin-left: 15px;
-  padding: 12px 24px;
-  font-size: clamp(1rem, 4vw, 1.2rem);
-  color: var(--white);
-  background-color: var(--primary-color);
-  border: none;
-  border-radius: 20px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+@keyframes slideIn {
+  from { transform: translateY(20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
 }
 
-#play-button:hover,
-#pause-button:hover {
-  background-color: var(--secondary-color);
-  transform: scale(1.05);
+@keyframes hintPulse {
+  0% { transform: scale(1); background-color: var(--light-yellow); }
+  50% { transform: scale(1.1); background-color: var(--yellow); }
+  100% { transform: scale(1); background-color: var(--light-yellow); }
 }
 
-#pause-button {
-  margin-left: 15px;
-  padding: 12px 24px;
-  font-size: clamp(1rem, 4vw, 1.2rem);
-  color: var(--white);
-  background-color: var(--primary-color);
-  border: none;
-  border-radius: 20px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-}
-
-#timer {
-  padding: 0.75rem 1.5rem;
-  font-size: clamp(1rem, 4vw, 1.2rem);
-  color: var(--white);
-  background-color: var(--primary-color);
-  border-radius: 20px;
-  box-shadow: var(--shadow-md);
-  font-weight: 700;
-  transition: all var(--transition-normal);
-}
-
-#timer:hover {
-  background-color: var(--secondary-color);
-  transform: scale(1.05);
-}
-
-.footer-container {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: center;
-  gap: 1rem;
-  margin-top: 1.5rem;
+/* Animação para células com dicas */
+@keyframes hintPulse {
+  0% {
+    transform: scale(1);
+    background-color: var(--light-yellow);
+  }
+  50% {
+    transform: scale(1.1);
+    background-color: var(--yellow);
+    box-shadow: 0 0 10px var(--yellow);
+  }
+  100% {
+    transform: scale(1);
+    background-color: var(--light-yellow);
+  }
 }
