@@ -129,14 +129,19 @@ h1:hover {
   background-color: rgba(33, 150, 243, 0.5) !important;
   transform: scale(1.02);
   transition: all 0.2s ease;
-  box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.7) !important;
+  box-shadow: 0 0 8px var(--light-purple), 0 0 15px var(--light-purple);
   z-index: 1;
   position: relative;
 }
 
+.cell:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--dark-purple);
+}
+
 .cell.highlight {
-  background-color: rgba(255, 235, 59, 0.3);
-  box-shadow: 0 0 0 2px rgba(255, 235, 59, 0.7);
+  background-color: var(--cell-bg);
+  box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.7);
 }
 
 .cell.highlight-fixed {
@@ -175,6 +180,7 @@ h1:hover {
 
 #new-game-button:hover,
 #solve-button:hover {
+  box-shadow: 0 0 12px var(--primary-color);
   background-color: var(--secondary-color);
   transform: scale(1.05);
 }
