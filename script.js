@@ -257,13 +257,18 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function isCurrentBoardValid() {
         const board = getCurrentBoardState();
-
+    
         for (let row = 0; row < SIZE; row++) {
             for (let col = 0; col < SIZE; col++) {
                 const num = board[row][col];
-                if (num !== 0 && !isValidPlacement(num, row, col, board)) {
-                    highlightInvalidCell(row, col);
-                    return false;
+                if (num !== 0) {
+                    board[row][col] = 0; // remove temporariamente o número
+                    if (!isValidPlacement(num, row, col, board)) {
+                        highlightInvalidCell(row, col);
+                        board[row][col] = num; // restaura o valor
+                        return false;
+                    }
+                    board[row][col] = num; // restaura o valor
                 }
             }
         }
@@ -293,13 +298,13 @@ document.addEventListener("DOMContentLoaded", () => {
                 if (cell.classList.contains("fixed")) {
                     // Destaque diferente para números fixos (pré-preenchidos)
                     cell.classList.add("highlight-fixed");
-                    cell.style.backgroundColor = 'rgba(139, 195, 74, 0.3)';
-                    cell.style.boxShadow = '0 0 0 2px rgba(139, 195, 74, 0.7)';
+                    cell.style.backgroundColor = '#d8a4ff';
+                    cell.style.boxShadow = '0 0 0 2px #8436c7';
                 } else {
                     // Destaque para números inseridos pelo jogador
                     cell.classList.add("highlight");
-                    cell.style.backgroundColor = 'rgba(255, 235, 59, 0.3)';
-                    cell.style.boxShadow = '0 0 0 2px rgba(255, 235, 59, 0.7)';
+                    cell.style.backgroundColor = '#d8a4ff';
+                    cell.style.boxShadow = '0 0 0 2px  #8436c7';
                 }
             }
         });
