@@ -70,7 +70,6 @@ document.addEventListener("DOMContentLoaded", () => {
     function setupHintButton() {
         hintButton.addEventListener('click', provideHint);
     }
-
     function provideHint() {
         const now = Date.now();
         // Verificar cooldown
@@ -108,7 +107,6 @@ document.addEventListener("DOMContentLoaded", () => {
         // Feedback para o jogador
         showCustomAlert("Dica", `Número ${solutionBoard[row][col]} adicionado!`, "info");
     }
-
     // Cronômetro
     function startTimer() {
         clearInterval(timerInterval);
@@ -119,14 +117,12 @@ document.addEventListener("DOMContentLoaded", () => {
             updateTimerDisplay();
         }, 1000);
     }
-
     function updateTimerDisplay() {
         const minutes = Math.floor(seconds / 60);
         const remainingSeconds = seconds % 60;
         document.getElementById('timer').textContent = 
             `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
     }
-
     // Configuração do modal
     function setupModal() {
         modalButton.addEventListener("click", () => modal.style.display = "none");
@@ -134,7 +130,6 @@ document.addEventListener("DOMContentLoaded", () => {
             if (event.target === modal) modal.style.display = "none";
         });
     }
-
     // Criação da grade
     function createGrid() {
         for (let i = 0; i < SIZE * SIZE; i++) {
@@ -152,7 +147,6 @@ document.addEventListener("DOMContentLoaded", () => {
             grid.appendChild(cell);
         }
     }
-
     // Validação de entrada da célula
     function validateCellInput(e) {
         const value = e.target.value;
@@ -160,34 +154,29 @@ document.addEventListener("DOMContentLoaded", () => {
             e.target.value = "";
         }
     }
-
     // Configuração do botão Novo Jogo
     function setupNewGameButton() {
         newGameButton.addEventListener("click", resetGame);
     }
-
     // Configuração do botão de resolver
     function setupSolveButton() {
         solveButton.addEventListener("click", solveCurrentSudoku);
     }
-
     // Função para resetar o jogo
     function resetGame() {
         clearInterval(timerInterval);
         generateSudoku();
         startTimer();
         modal.style.display = "none";
+        lastHintTime = 0; // Resetar o timer de dicas
     }
-
     // Lógica para resolver o Sudoku atual
     function solveCurrentSudoku() {
         if (!isCurrentBoardValid()) {
             showCustomAlert("Atenção", "O tabuleiro contém valores inválidos. Corrija antes de resolver.", "error");
             return;
         }
-
         const boardToSolve = getCurrentBoardState();
-
         if (solveSudoku(boardToSolve)) {
             updateCellsFromBoard(boardToSolve);
             clearInterval(timerInterval);
@@ -197,7 +186,6 @@ document.addEventListener("DOMContentLoaded", () => {
             showCustomAlert("Poxa Mozi", "Tenta de novo aí", "error");
         }
     }
-
     // Geração de um novo Sudoku
     function generateSudoku() {
         currentBoard = createEmptyBoard();
@@ -209,12 +197,10 @@ document.addEventListener("DOMContentLoaded", () => {
         removeNumbers(currentBoard);
         fillCells(currentBoard);
     }
-
     // Funções auxiliares do Sudoku
     function createEmptyBoard() {
         return Array.from({ length: SIZE }, () => Array(SIZE).fill(0));
     }
-
     function fillBoard(board) {
         for (let row = 0; row < SIZE; row++) {
             for (let col = 0; col < SIZE; col++) {
@@ -233,7 +219,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
         return true;
     }
-
+    // Remover números para criar o tabuleiro jogável
     function removeNumbers(board) {
         let cellsToRemove = MIN_REMOVED_CELLS + Math.floor(Math.random() * (MAX_REMOVED_CELLS - MIN_REMOVED_CELLS + 1));
         let attempts = 0;
@@ -257,7 +243,7 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         }
     }
-
+    // Contar soluções para verificar unicidade
     function countSolutions(board, count = 0) {
         for (let row = 0; row < SIZE; row++) {
             for (let col = 0; col < SIZE; col++) {
@@ -275,7 +261,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
         return count + 1;
     }
-
+    // Preencher células com valores do tabuleiro
     function fillCells(board) {
         for (let row = 0; row < SIZE; row++) {
             for (let col = 0; col < SIZE; col++) {
@@ -286,10 +272,11 @@ document.addEventListener("DOMContentLoaded", () => {
                 cell.value = value || "";
                 cell.classList.toggle("fixed", value !== 0);
                 cell.disabled = value !== 0;
+                cell.classList.remove("hint"); // Resetar classe de dica
             }
         }
     }
-
+    // Resolver Sudoku usando backtracking
     function solveSudoku(board) {
         for (let row = 0; row < SIZE; row++) {
             for (let col = 0; col < SIZE; col++) {
@@ -307,7 +294,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
         return true;
     }
-
+    // Verifica se o número pode ser colocado na célula
     function isValidPlacement(num, row, col, board) {
         // Verifica linha e coluna
         for (let i = 0; i < SIZE; i++) {
@@ -316,7 +303,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 return false;
             }
         }
-
         // Verifica quadrante 3x3
         const startRow = Math.floor(row / SUBGRID_SIZE) * SUBGRID_SIZE;
         const startCol = Math.floor(col / SUBGRID_SIZE) * SUBGRID_SIZE;
@@ -328,10 +314,9 @@ document.addEventListener("DOMContentLoaded", () => {
                 }
             }
         }
-
         return true;
     }
-
+    // Verifica se o tabuleiro atual é válido
     function isCurrentBoardValid() {
         const board = getCurrentBoardState();
         // Verifica se o tabuleiro atual é válido
@@ -351,8 +336,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
         return true;
     }
-
-    // NOVA FUNÇÃO: Destacar números iguais
+    //Destacar números iguais
     function highlightSameNumbers(e) {
         // Remove destaque anterior
         cells.forEach(c => {
@@ -360,15 +344,13 @@ document.addEventListener("DOMContentLoaded", () => {
             c.style.backgroundColor = '';
             c.style.boxShadow = '';
         });
-
+        // Verifica se a célula clicada é válida
         const clickedCell = e.target;
         const clickedValue = clickedCell.value;
 
         if (!clickedValue) return;
-
         // Adiciona classe à célula clicada
         clickedCell.classList.add("selected");
-
         // Destaca todas as células com o mesmo valor
         cells.forEach(cell => {
             if (cell.value === clickedValue) {
@@ -386,13 +368,13 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         });
     }
-
+    // Destacar célula inválida
     function highlightInvalidCell(row, col) {
         const index = row * SIZE + col;
         cells[index].classList.add("invalid");
         setTimeout(() => cells[index].classList.remove("invalid"), 2000);
     }
-
+    // Obter o estado atual do tabuleiro
     function getCurrentBoardState() {
         const board = createEmptyBoard();
         for (let i = 0; i < cells.length; i++) {
@@ -403,7 +385,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
         return board;
     }
-
+    // Atualizar células a partir do tabuleiro
     function updateCellsFromBoard(board) {
         cells.forEach((cell, i) => {
             const row = Math.floor(i / SIZE);
@@ -413,7 +395,7 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         });
     }
-
+    // Limpar todas as células
     function clearAllCells() {
         cells.forEach(cell => {
             cell.value = "";
@@ -421,7 +403,7 @@ document.addEventListener("DOMContentLoaded", () => {
             cell.disabled = false;
         });
     }
-
+    // Mostrar modal personalizado
     function showCustomAlert(title, message, type) {
         if (type === "success") {
             clearInterval(timerInterval);
@@ -436,7 +418,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         modal.style.display = "block";
     }
-
+    // Embaralhar array
     function shuffleArray(array) {
         for (let i = array.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
@@ -444,10 +426,8 @@ document.addEventListener("DOMContentLoaded", () => {
         }
         return array;
     }
-
     // Evento para tocar áudio
     document.getElementById('play-button').addEventListener('click', function() {
         audioPlayer.play();
     });
-
 });

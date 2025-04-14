@@ -316,6 +316,12 @@ h1:hover {
   to { transform: translateY(0); opacity: 1; }
 }
 
+@keyframes hintPulse {
+  0% { transform: scale(1); background-color: var(--light-yellow); }
+  50% { transform: scale(1.1); background-color: var(--yellow); }
+  100% { transform: scale(1); background-color: var(--light-yellow); }
+}
+
 /* Acessibilidade */
 .sr-only {
   position: absolute;
