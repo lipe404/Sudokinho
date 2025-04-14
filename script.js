@@ -1,4 +1,5 @@
 document.addEventListener("DOMContentLoaded", () => {
+
     // Constantes e configurações
     const SIZE = 9;
     const SUBGRID_SIZE = 3;
@@ -372,4 +373,5 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById('play-button').addEventListener('click', function() {
         audioPlayer.play();
     });
+
 });
