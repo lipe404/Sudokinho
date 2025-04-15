@@ -58,6 +58,8 @@ document.addEventListener("DOMContentLoaded", () => {
     let seconds = 0;
     let lastHintTime = 0; // Controle do tempo entre dicas
     let playerCompleted = false; // Para verificar se o jogador completou o jogo
+    let animacaoAtiva = true;
+    let loopAnimacao;
     // Inicialização do jogo
     initGame();
     // Função principal de inicialização
@@ -68,6 +70,9 @@ document.addEventListener("DOMContentLoaded", () => {
         setupNewGameButton();
         setupHintButton();
         setupAudioControls();
+        // Animação inicial do grid
+        animarGridSudoku()
+        grid.classList.add("grid-animation")
     }
     //Controles de Áudio
     function setupAudioControls() {
@@ -150,7 +155,7 @@ document.addEventListener("DOMContentLoaded", () => {
     function updateTimerDisplay() {
         const minutes = Math.floor(seconds / 60);
         const remainingSeconds = seconds % 60;
-        document.getElementById('timer').textContent = 
+        document.getElementById('timer').textContent =
             `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
     }
     // Configuração do modal
@@ -191,6 +196,8 @@ document.addEventListener("DOMContentLoaded", () => {
     function setupNewGameButton() {
         newGameButton.addEventListener("click", () => {
             newGameButton.disabled = true;
+            grid.classList.remove("grid-animation"); // Remove a animação
+            animacaoAtiva = false;
             showDifficultyModal();
         });
     }
@@ -235,6 +242,7 @@ document.addEventListener("DOMContentLoaded", () => {
         // Remover números para criar o tabuleiro jogável com base na dificuldade
         removeNumbers(currentBoard, currentDifficulty); // Note o currentDifficulty aqui
         fillCells(currentBoard);
+        animacaoAtiva = false; // Desativa animação após gerar o novo jogo
     }
     // Funções auxiliares do Sudoku
     function createEmptyBoard() {
@@ -522,6 +530,27 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         }
         return true;
+    }
+    // Função de animação inicial das células
+    function animarGridSudoku() {
+        const cells = document.querySelectorAll('.cell');
+        // Defina primeiro a função interna
+        function animarSequencia() {
+            cells.forEach((cell, i) => {
+                setTimeout(() => {
+                    cell.classList.add('animated');
+                    setTimeout(() => cell.classList.remove('animated'), 1200);
+                }, i * 15); // Efeito cascata
+            });
+        }
+        // Executa uma vez
+        animarSequencia();
+        // Depois inicia o loop com intervalo
+        loopAnimacao = setInterval(() => {
+            if (animacaoAtiva) {
+                animarSequencia();
+            }
+        }, 1500); // Tempo total da animação + atraso
     }
     // Evento para tocar áudio
     document.getElementById('play-button').addEventListener('click', function() {

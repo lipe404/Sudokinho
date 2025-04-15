@@ -123,6 +123,10 @@ h1:hover {
   transition: all var(--transition-normal);
 }
 
+.cell.animated {
+  animation: colorFlash 1.2s ease-in-out;
+}
+
 .cell.fixed {
   background-color: var(--cell-fixed-bg);
   color: var(--dark-purple);
@@ -499,4 +503,25 @@ h1:hover {
     transform: scale(1);
     background-color: #d8a4ff;
   }
+}
+
+/* Animação para tela de início */
+@keyframes colorAnimation {
+  0% { background-color: #3a136b; }
+  25% { background-color: #3a136b; }
+  50% { background-color: #3495ce; }
+  75% { background-color: #1954d4; }
+  100% { background-color: #4b0a53; }
+}
+
+.grid-animation {
+  animation: colorAnimation 2s infinite;
+}
+
+@keyframes colorFlash {
+  0%   { background-color: #f063f0; }
+  25%  { background-color: #00ffff; }
+  50%  { background-color: #f1ab7b; }
+  75%  { background-color: #67fa67; }
+  100% { background-color: #f063f0; }
 }
