@@ -351,6 +351,7 @@ h1::after {
   transition: all var(--transition-normal);
   font-weight: 600;
 }
+/* Estilos para os botões de dificuldade */
 .difficulty-btn[data-difficulty="easy"] {
   background-color: var(--light-purple);
   color: white;
@@ -390,34 +391,28 @@ h1::after {
       box-shadow: 0 0 0 1px rgba(0,0,0,0.3);
   }
 }
-
 /* ===== MEDIA QUERIES ===== */
 @media (max-width: 480px) {
   body {
       padding: 5px;
       background-size: cover, cover;
   }
-
   #sudoku-grid {
       width: calc(100vw - 20px);
       max-width: calc(100vh - 100px);
   }
-
   .cell {
       font-size: clamp(0.8rem, 4.5vw, 1.2rem);
   }
-
   #solve-button {
       max-width: none;
       padding: 12px;
   }
-
   .modal-content {
       margin: 5vh auto;
       padding: 20px;
   }
 }
-
 @media (max-height: 600px) {
   #sudoku-grid {
       max-width: calc(100vw - 40px);
@@ -429,18 +424,15 @@ h1::after {
       padding: 10px;
   }
 }
-
 /* ===== ANIMAÇÕES ===== */
 @keyframes fadeIn {
   from { opacity: 0; }
   to { opacity: 1; }
 }
-
 @keyframes slideIn {
   from { transform: translateY(20px); opacity: 0; }
   to { transform: translateY(0); opacity: 1; }
 }
-
 @keyframes hintPulse {
   0% { transform: scale(1); background-color: #d8a4ff; }
   50% { transform: scale(1.1); background-color: #e1c8ff; }
@@ -457,7 +449,6 @@ h1::after {
     transform: translateY(0);
   }
 }
-
 @keyframes gradientMove {
   0% {
     background-position: 0% 50%;
@@ -469,7 +460,6 @@ h1::after {
     background-position: 0% 50%;
   }
 }
-
 /* Animação para células com dicas */
 @keyframes hintPulse {
   0% {
@@ -486,7 +476,6 @@ h1::after {
     background-color: #d8a4ff;
   }
 }
-
 /* Animação para tela de início */
 @keyframes colorAnimation {
   0% { background-color: #5b1fa8; }
@@ -495,11 +484,9 @@ h1::after {
   75% { background-color: #bd27bd; }
   100% { background-color: #5b1fa8; }
 }
-
 .grid-animation {
   animation: colorAnimation 2s infinite;
 }
-
 @keyframes colorFlash {
   0% { background-color: #5b1fa8; }
   10% { background-color: #6a41a0; }
