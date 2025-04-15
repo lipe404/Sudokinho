@@ -531,12 +531,12 @@ h1:hover {
 
   0%   { box-shadow: 0 0 5px #fff; transform: scale(1); }
   10%  { box-shadow: 0 0 10px #ff00cc; transform: scale(1.05); }
-  20%  { box-shadow: 0 0 15px #ff00cc; transform: scale(1.1); }
-  30%  { box-shadow: 0 0 20px #ff00cc; transform: scale(1.15); }
-  40%  { box-shadow: 0 0 10px #ff00cc; transform: scale(1.05); }
-  50%  { box-shadow: 0 0 15px #ff00cc; transform: scale(1.1); }
-  60%  { box-shadow: 0 0 20px #ff00cc; transform: scale(1.15); }
-  70%  { box-shadow: 0 0 10px #ff00cc; transform: scale(1.05); }
+  20%  { box-shadow: 0 0 15px #b60192; transform: scale(1.1); }
+  30%  { box-shadow: 0 0 20px #4e0c41; transform: scale(1.15); }
+  40%  { box-shadow: 0 0 10px #350c2d; transform: scale(1.05); }
+  50%  { box-shadow: 0 0 15px #350c2d; transform: scale(1.1); }
+  60%  { box-shadow: 0 0 20px #4e0c41; transform: scale(1.15); }
+  70%  { box-shadow: 0 0 10px #b60192; transform: scale(1.05); }
   80%  { box-shadow: 0 0 5px #ff00cc; transform: scale(1); }
   90%  { box-shadow: 0 0 5px #fff; transform: scale(1); }
   100% { box-shadow: 0 0 5px #fff; transform: scale(1); }
