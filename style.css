@@ -1,3 +1,14 @@
+/* Estilização geral do jogo Sudoku
+  Autor: Felipe Toledo
+  Versão: 2.0
+  Data: 15-04-2025
+  Descrição: Este código contém a estilização do jogo Sudoku, incluindo cores, fontes, animações e responsividade.
+  O design é inspirado em temas de jogos retrô e utiliza uma paleta de cores vibrantes para criar uma experiência visual envolvente.
+  O código é organizado em seções para facilitar a leitura e manutenção, com comentários explicativos para cada parte.
+  O jogo é responsivo e se adapta a diferentes tamanhos de tela, garantindo uma boa experiência em dispositivos móveis e desktops.
+  O código inclui animações para interações do usuário, como hover e foco, além de transições suaves para elementos dinâmicos.
+  O jogo também possui um sistema de feedback visual para ações como seleção de células, dicas e erros, melhorando a usabilidade e acessibilidade.
+*/
 :root {
   /* Cores principais do jogo */
   --primary-color: #5b1fa8;
@@ -77,6 +88,7 @@ body {
   animation: fadeInTop 0.8s ease-in-out;
 }
 
+/* Título */
 h1 {
   font-family: 'Press Start 2P', monospace; /* fonte opcional estilo retrô */
   letter-spacing: 10px;

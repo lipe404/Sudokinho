@@ -2,6 +2,7 @@
  * Sudoku Game Script
  * Desenvolvido por Felipe Toledo @spaceman.404
  * Versão: 2.0
+ * Data: 15-04-2025
  * Descrição: Gera um tabuleiro de Sudoku com diferentes níveis de dificuldade,
  * permite ao usuário resolver o puzzle e verificar a validade da solução.
  * Inclui funcionalidades de dica, cronômetro e animações.
