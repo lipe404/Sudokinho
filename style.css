@@ -507,11 +507,11 @@ h1:hover {
 
 /* Animação para tela de início */
 @keyframes colorAnimation {
-  0% { background-color: #3a136b; }
-  25% { background-color: #3a136b; }
-  50% { background-color: #3495ce; }
-  75% { background-color: #1954d4; }
-  100% { background-color: #4b0a53; }
+  0% { background-color: #5b1fa8; }
+  25% { background-color: #8761b8; }
+  50% { background-color: #70e2f7; }
+  75% { background-color: #bd27bd; }
+  100% { background-color: #5b1fa8; }
 }
 
 .grid-animation {
@@ -519,9 +519,9 @@ h1:hover {
 }
 
 @keyframes colorFlash {
-  0%   { background-color: #f063f0; }
-  25%  { background-color: #00ffff; }
-  50%  { background-color: #f1ab7b; }
-  75%  { background-color: #67fa67; }
-  100% { background-color: #f063f0; }
+  0% { background-color: #5b1fa8; }
+  25% { background-color: #8761b8; }
+  50% { background-color: #70e2f7; }
+  75% { background-color: #bd27bd; }
+  100% { background-color: #5b1fa8; }
 }
