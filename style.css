@@ -81,15 +81,35 @@ h1 {
   font-family: 'Press Start 2P', monospace; /* fonte opcional estilo retrô */
   letter-spacing: 10px;
   font-size: clamp(2.5rem, 4vw, 2rem);
-  background: linear-gradient(to right, var(--white), var(--dark-purple));
+  background: linear-gradient(90deg,#ff00cc,#3333ff,#00ffff,#ff00cc);
+  background-size: 400% 100%;
+  animation: gradientMove 6s ease infinite;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-  text-shadow: 1px 1px 0 var(--primary-color), 1px 1px 0 var(--dark-purple);
+  text-shadow: 1px 1px 0 var(--dark-purple);
+  filter: contrast(130%) brightness(120%) saturate(150%);
 }
 
 h1:hover {
   transform: scale(1.02);
   background-color: var(--white);
+}
+h1::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: repeating-linear-gradient(
+    to bottom,
+    rgba(255, 255, 255, 0.05) 0px,
+    rgba(255, 255, 255, 0.05) 1px,
+    transparent 1px,
+    transparent 2px
+  );
+  pointer-events: none;
+  z-index: 2;
 }
 
 /* Grade do Sudoku*/
@@ -505,6 +525,19 @@ h1:hover {
     transform: translateY(0);
   }
 }
+
+@keyframes gradientMove {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
 /* Animação para células com dicas */
 @keyframes hintPulse {
   0% {
