@@ -197,6 +197,12 @@ h1::after {
   -webkit-appearance: none;
   margin: 0;
 }
+/* Estilo para células com dica */
+.cell.hint {
+  background-color: var(--white);
+  color: var(--black);
+  font-weight: bold;
+}
 /* Bordas */
 .cell:nth-child(3n) {
   border-right: 3px solid var(--dark-purple);
@@ -213,7 +219,8 @@ h1::after {
 #solve-button,
 #hint-button,
 #play-button,
-#pause-button {
+#pause-button,
+#timer {
   font-family: 'Press Start 2P', monospace;
   padding: 14px 20px;
   font-size: clamp(1rem, 4vw, 1.2rem);
@@ -240,7 +247,10 @@ h1::after {
 }
 #new-game-button:hover,
 #solve-button:hover,
-#hint-button:hover {
+#hint-button:hover,
+#play-button:hover,
+#pause-button:hover,
+#timer:hover {
   box-shadow: 0 0 12px var(--primary-color);
   background-color: var(--secondary-color);
   transform: scale(1.05);
@@ -278,7 +288,6 @@ h1::after {
   backdrop-filter: blur(8px);
   animation: fadeIn var(--transition-normal);
 }
-
 .modal-content {
   background: linear-gradient(
     145deg,
@@ -294,10 +303,9 @@ h1::after {
   text-align: center;
   animation: slideIn var(--transition-normal);
 }
-
 .modal-button {
   background: linear-gradient(135deg, var(--primary-color), var(--primary-color));
-  color: var(--primary-color);
+  color: var(--cell-bg);
   border: none;
   padding: 12px 30px;
   font-size: 1.1rem;
@@ -306,14 +314,6 @@ h1::after {
   font-weight: 700;
   transition: all var(--transition-normal);
 }
-
-/* Estilo para células com dica */
-.cell.hint {
-  background-color: var(--white);
-  color: var(--black);
-  font-weight: bold;
-}
-
 /* Acessibilidade */
 .sr-only {
   position: absolute;
@@ -326,23 +326,7 @@ h1::after {
   white-space: nowrap;
   border-width: 0;
 }
-
-#timer {
-  font-size: clamp(1rem, 3vw, 1.4rem);
-  font-weight: bold;
-  color: var(--white);
-  padding: 8px 16px;
-  background-color: var(--primary-color);
-  border-radius: 20px;
-  box-shadow: var(--shadow-md);
-  transition: background-color var(--transition-fast);
-}
-
-#timer:hover {
-  background-color: var(--secondary-color);
-  transform: scale(1.05);
-}
-
+/* Rodapé */
 .footer-container {
   display: flex;
   flex-wrap: wrap;
@@ -351,7 +335,6 @@ h1::after {
   gap: 1rem;
   margin-top: 1.5rem;
 }
-
 /* Estilos para o modal de dificuldade */
 .difficulty-options {
   display: flex;
@@ -359,7 +342,6 @@ h1::after {
   gap: 1rem;
   margin-top: 1.5rem;
 }
-
 .difficulty-btn {
   padding: 12px 24px;
   font-size: 1.1rem;
@@ -369,43 +351,35 @@ h1::after {
   transition: all var(--transition-normal);
   font-weight: 600;
 }
-
 .difficulty-btn[data-difficulty="easy"] {
   background-color: var(--light-purple);
   color: white;
 }
-
 .difficulty-btn[data-difficulty="medium"] {
   background-color: var(--warning-color);
   color: white;
 }
-
 .difficulty-btn[data-difficulty="hard"] {
   background-color: var(--error-color);
   color: white;
 }
-
 .difficulty-btn:hover {
   transform: translateY(-2px);
   box-shadow: var(--shadow-md);
 }
-
 #difficultyModal {
   transition: opacity 0.3s ease;
   opacity: 0;
   pointer-events: none;
 }
-
 #difficultyModal.fade-in {
   opacity: 1;
   pointer-events: auto;
 }
-
 #difficultyModal.fade-out {
   opacity: 0;
   pointer-events: none;
 }
-
 /* Melhorias para mobile */
 @media (max-width: 480px) {
   .cell.selected {
