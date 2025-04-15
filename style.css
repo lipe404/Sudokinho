@@ -240,6 +240,17 @@ h1:hover {
   color: var(--black);
 }
 
+.button:disabled {
+  background-color: var(--gray);
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.button:focus-visible {
+  outline: 3px solid var(--light-yellow);
+  outline-offset: 2px;
+}
+
 #play-button {
   margin-left: 15px;
   padding: 12px 24px;
@@ -273,13 +284,17 @@ h1:hover {
 }
 
 .custom-modal {
+  display: none;
   position: fixed;
   inset: 0;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(91, 31, 168, 0.7);
   z-index: 1000;
-  display: none;
   justify-content: center;
   align-items: center;
-  background-color: rgba(91, 31, 168, 0.7);
   backdrop-filter: blur(8px);
   animation: fadeIn var(--transition-normal);
 }
@@ -310,19 +325,6 @@ h1:hover {
   cursor: pointer;
   font-weight: 700;
   transition: all var(--transition-normal);
-}
-
-.custom-modal {
-  display: none;
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0,0,0,0.7);
-  z-index: 1000;
-  justify-content: center;
-  align-items: center;
 }
 
 /* Estilo para células com dica */
@@ -414,7 +416,6 @@ h1:hover {
   transform: translateY(-2px);
   box-shadow: var(--shadow-md);
 }
-
 
 /* Melhorias para mobile */
 @media (max-width: 480px) {
