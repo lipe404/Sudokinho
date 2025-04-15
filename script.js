@@ -1,3 +1,28 @@
+/**
+ * Sudoku Game Script
+ * Desenvolvido por Felipe Toledo @spaceman.404
+ * Versão: 2.0
+ * Descrição: Gera um tabuleiro de Sudoku com diferentes níveis de dificuldade,
+ * permite ao usuário resolver o puzzle e verificar a validade da solução.
+ * Inclui funcionalidades de dica, cronômetro e animações.
+ * O jogo é jogável em dispositivos móveis e desktop.
+ * Funcionalidades:
+ * - Geração de tabuleiro aleatório
+ * - Validação de entradas
+ * - Resolução automática
+ * - Dicas para o jogador
+ * - Cronômetro para medir o tempo de jogo
+ * - Modal para mensagens e alertas
+ * - Controle de áudio
+ * - Destaque para células e números iguais
+ * - Animações para dicas e validações
+ * - Responsividade para dispositivos móveis
+ * - Estilo moderno e atraente
+ * - Código modular e limpo
+ * - Comentários explicativos
+ * - Melhorias de desempenho
+ * - Controle de dificuldade
+ */
 document.addEventListener("DOMContentLoaded", () => {
     // Constantes e configurações
     const SIZE = 9; // Tamanho da grade do Sudoku (9x9)
