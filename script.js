@@ -32,6 +32,7 @@ document.addEventListener("DOMContentLoaded", () => {
     let timerInterval;
     let seconds = 0;
     let lastHintTime = 0; // Controle do tempo entre dicas
+    let playerCompleted = false; // Para verificar se o jogador completou o jogo
     // Inicialização do jogo
     initGame();
     // Função principal de inicialização
@@ -157,6 +158,9 @@ document.addEventListener("DOMContentLoaded", () => {
         if (value && !/^[1-9]$/.test(value)) {
             e.target.value = "";
         }
+        else {
+            checkIfPlayerCompletedBoard(); // <-- Checagem após digitação válida
+        }
     }
     // Configuração do botão Novo Jogo
     function setupNewGameButton() {
@@ -174,6 +178,7 @@ document.addEventListener("DOMContentLoaded", () => {
         clearInterval(timerInterval);
         clearAllCells();
         generateSudoku(); // Gera o jogo com a dificuldade atual
+        playerCompleted = false; // Reseta o status de conclusão do jogador
     }
     // Lógica para resolver o Sudoku atual
     function solveCurrentSudoku() {
@@ -182,11 +187,12 @@ document.addEventListener("DOMContentLoaded", () => {
             return;
         }
         const boardToSolve = getCurrentBoardState();
+        playerCompleted = false; // O jogador não completou manualmente
         if (solveSudoku(boardToSolve)) {
             updateCellsFromBoard(boardToSolve);
             clearInterval(timerInterval);
             const finalTime = document.getElementById('timer').textContent;
-            showCustomAlert("Parabéns!", `Você completou em ${finalTime}! Você é a melhor!`, "success");
+            showCustomAlert("Jogo Resolvido", "O jogo foi resolvido pela máquina.", "info");
         } else {
             showCustomAlert("Poxa", "Tenta de novo aí", "error");
         }
@@ -329,7 +335,7 @@ document.addEventListener("DOMContentLoaded", () => {
     function isValidPlacement(num, row, col, board) {
         // Verifica linha e coluna
         for (let i = 0; i < SIZE; i++) {
-            if ((board[row][i] === num && i !== col) || 
+            if ((board[row][i] === num && i !== col) ||
                 (board[i][col] === num && i !== row)) {
                 return false;
             }
@@ -438,6 +444,9 @@ document.addEventListener("DOMContentLoaded", () => {
     function showCustomAlert(title, message, type) {
         if (type === "success") {
             clearInterval(timerInterval);
+            if (playerCompleted) {
+                message = `Parabéns! Você completou em ${document.getElementById('timer').textContent}!`;
+            }
         }
         modalTitle.textContent = title;
         modalMessage.textContent = message;
@@ -456,6 +465,38 @@ document.addEventListener("DOMContentLoaded", () => {
             [array[i], array[j]] = [array[j], array[i]];
         }
         return array;
+    }
+    // Verifica se o jogador completou o tabuleiro
+    function checkIfPlayerCompletedBoard() {
+        const board = getCurrentBoardState();
+        if (isBoardComplete(board) && isBoardCorrect(board)) {
+            clearInterval(timerInterval);
+            const finalTime = document.getElementById('timer').textContent;
+            showCustomAlert("Parabéns!", `Você completou o Sudoku corretamente em ${finalTime}!`, "success");
+            playerCompleted = true;
+        }
+    }
+    // Verifica se o tabuleiro está completo
+    function isBoardComplete(board) {
+        for (let row = 0; row < SIZE; row++) {
+            for (let col = 0; col < SIZE; col++) {
+                if (board[row][col] === 0) return false;
+            }
+        }
+        return true;
+    }
+    // Verifica se o tabuleiro está correto
+    function isBoardCorrect(board) {
+        for (let row = 0; row < SIZE; row++) {
+            for (let col = 0; col < SIZE; col++) {
+                const value = board[row][col];
+                board[row][col] = 0;
+                const isValid = isValidPlacement(value, row, col, board);
+                board[row][col] = value;
+                if (!isValid) return false;
+            }
+        }
+        return true;
     }
     // Evento para tocar áudio
     document.getElementById('play-button').addEventListener('click', function() {
