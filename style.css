@@ -9,6 +9,7 @@
   O código inclui animações para interações do usuário, como hover e foco, além de transições suaves para elementos dinâmicos.
   O jogo também possui um sistema de feedback visual para ações como seleção de células, dicas e erros, melhorando a usabilidade e acessibilidade.
 */
+
 /* ===== VARIÁVEIS CSS ===== */
 :root {
   /* Cores principais do jogo */
@@ -210,19 +211,32 @@ h1::after {
 /* Botões de controle de aúdio e controle do jogo*/
 #new-game-button,
 #solve-button,
-#hint-button {
-  margin: 0;
-  padding: 12px 6px;
+#hint-button,
+#play-button,
+#pause-button {
+  font-family: 'Press Start 2P', monospace;
+  padding: 14px 20px;
   font-size: clamp(1rem, 4vw, 1.2rem);
   color: var(--white);
   background-color: var(--primary-color);
   border: none;
-  border-radius: 8px;
+  border-radius: 12px;
   cursor: pointer;
-  transition: all var(--transition-normal);
+  text-transform: uppercase;
   box-shadow: var(--shadow-md);
   max-width: 200px;
   display: block;
+  background: linear-gradient(
+    135deg, var(--dark-purple),
+    var(--primary-color),
+    var(--secondary-color)
+  );
+  background-size: 400% 400%;
+  -webkit-border-radius: 12px;
+  -moz-border-radius: 12px;
+  -ms-border-radius: 12px;
+  -o-border-radius: 12px;
+  transition: all var(--transition-normal);
 }
 #new-game-button:hover,
 #solve-button:hover,
@@ -231,35 +245,23 @@ h1::after {
   background-color: var(--secondary-color);
   transform: scale(1.05);
 }
+/* Estilização personalizada para cada botão -- para adicionar se preferir
 #play-button {
-  margin-left: 15px;
-  padding: 12px 24px;
-  font-size: clamp(1rem, 4vw, 1.2rem);
-  color: var(--white);
-  background-color: var(--primary-color);
-  border: none;
-  border-radius: 20px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-}
-#play-button:hover,
-#pause-button:hover {
-  background-color: var(--secondary-color);
-  transform: scale(1.05);
+  background: linear-gradient(135deg, #00ffff, #ff00cc);
 }
 #pause-button {
-  margin-left: 15px;
-  padding: 12px 24px;
-  font-size: clamp(1rem, 4vw, 1.2rem);
-  color: var(--white);
-  background-color: var(--primary-color);
-  border: none;
-  border-radius: 20px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  background: linear-gradient(135deg, #ff8800, #ff00cc);
 }
+#new-game-button {
+  background: linear-gradient(135deg, #00ff99, #3333ff);
+}
+#hint-button {
+  background: linear-gradient(135deg, #ffff00, #ff00cc);
+}
+#solve-button {
+  background: linear-gradient(135deg, #ff5555, #00ffff);
+}
+*/
 /* Modals */
 .custom-modal {
   display: none;
