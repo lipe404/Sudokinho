@@ -290,27 +290,38 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
     // Função para exibir o modal de dificuldade
+    function handleDifficultySelection(event) {
+        const difficulty = event.target.getAttribute('data-difficulty');
+        currentDifficulty = DIFFICULTY_LEVELS[difficulty];
+        hideModal('difficultyModal');
+        resetGame();
+        startTimer();
+        newGameButton.disabled = false;
+    }
+    // Função para mostrar modais com transição
+    function showModal(modalId) {
+        const modal = document.getElementById(modalId);
+        modal.style.display = 'flex';
+        modal.classList.add('fade-in');
+    }
+    // Função para esconder modais com transição
+    function hideModal(modalId) {
+        const modal = document.getElementById(modalId);
+        modal.classList.remove('fade-in');
+        modal.classList.add('fade-out');
+        // Espera o fim da animação antes de ocultar
+        setTimeout(() => {
+            modal.style.display = 'none';
+            modal.classList.remove('fade-out');
+        }, 300); // tempo igual ao da animação CSS
+    }
+    // Função principal para exibir o modal de dificuldade
     function showDifficultyModal() {
-        const difficultyModal = document.getElementById('difficultyModal');
-        difficultyModal.style.display = 'flex';
-        // Configurar os botões de dificuldade
-        const difficultyButtons = document.querySelectorAll('.difficulty-btn');
-        // Remover event listeners antigos para evitar duplicação
-        difficultyButtons.forEach(button => {
-            button.removeEventListener('click', handleDifficultySelection);
+        showModal('difficultyModal');
+        const buttons = document.querySelectorAll('.difficulty-btn');
+        buttons.forEach(button => {
+            button.addEventListener('click', handleDifficultySelection, { once: true });
         });
-        // Adicionar novos event listeners
-        difficultyButtons.forEach(button => {
-            button.addEventListener('click', handleDifficultySelection);
-        });
-        function handleDifficultySelection() {
-            const difficulty = this.getAttribute('data-difficulty');
-            currentDifficulty = DIFFICULTY_LEVELS[difficulty];
-            difficultyModal.style.display = 'none';
-            resetGame(); // Inicia o jogo com a dificuldade selecionada
-            startTimer(); // Inicia o timer após a seleção da dificuldade
-            newGameButton.disabled = false;
-        }
     }
     // Contar soluções para verificar unicidade
     function countSolutions(board, count = 0) {

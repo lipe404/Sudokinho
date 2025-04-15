@@ -421,6 +421,22 @@ h1:hover {
   box-shadow: var(--shadow-md);
 }
 
+#difficultyModal {
+  transition: opacity 0.3s ease;
+  opacity: 0;
+  pointer-events: none;
+}
+
+#difficultyModal.fade-in {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+#difficultyModal.fade-out {
+  opacity: 0;
+  pointer-events: none;
+}
+
 /* Melhorias para mobile */
 @media (max-width: 480px) {
   .cell.selected {
@@ -541,3 +557,5 @@ h1:hover {
   90%  { box-shadow: 0 0 5px #fff; transform: scale(1); }
   100% { box-shadow: 0 0 5px #fff; transform: scale(1); }
 }
+
+
