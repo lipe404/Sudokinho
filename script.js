@@ -22,6 +22,7 @@
  * - Comentários explicativos
  * - Melhorias de desempenho
  * - Controle de dificuldade
+ * - Animação de inicialização
  */
 document.addEventListener("DOMContentLoaded", () => {
     // Constantes e configurações
@@ -70,6 +71,9 @@ document.addEventListener("DOMContentLoaded", () => {
         setupNewGameButton();
         setupHintButton();
         setupAudioControls();
+        // Botão de resolver e dicas inicialmente ocultos
+        solveButton.style.display = "none";
+        hintButton.style.display = "none";
         // Animação inicial do grid
         animarGridSudoku()
         grid.classList.add("grid-animation")
@@ -242,6 +246,9 @@ document.addEventListener("DOMContentLoaded", () => {
         // Remover números para criar o tabuleiro jogável com base na dificuldade
         removeNumbers(currentBoard, currentDifficulty); // Note o currentDifficulty aqui
         fillCells(currentBoard);
+        // Botões de resolver e dicas apresentados
+        solveButton.style.display = "inline-block";
+        hintButton.style.display = "inline-block";
         animacaoAtiva = false; // Desativa animação após gerar o novo jogo
     }
     // Funções auxiliares do Sudoku
