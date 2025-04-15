@@ -494,7 +494,17 @@ h1:hover {
   50% { transform: scale(1.1); background-color: #e1c8ff; }
   100% { transform: scale(1); background-color: #d8a4ff; }
 }
-
+/* Animação para o container de cabeçalho */
+@keyframes fadeInTop {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
 /* Animação para células com dicas */
 @keyframes hintPulse {
   0% {
