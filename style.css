@@ -9,15 +9,17 @@
   O código inclui animações para interações do usuário, como hover e foco, além de transições suaves para elementos dinâmicos.
   O jogo também possui um sistema de feedback visual para ações como seleção de células, dicas e erros, melhorando a usabilidade e acessibilidade.
 */
+/* ===== VARIÁVEIS CSS ===== */
 :root {
   /* Cores principais do jogo */
   --primary-color: #5b1fa8;
   --secondary-color: #8436c7;
+  --tertiary-color: #ff00cc;
   --light-purple: #d8a4ff;
   --dark-purple: #3a136b;
   /* Cores de feedback */
   --sucess-color: #4caf50;
-  --error-color: #f44336;
+  --error-color: #ff5555;
   --warning-color: #ff9800;
   --info-color: #2196f3;
   /* Cores auxiliares */
@@ -29,8 +31,8 @@
   /* Cores de células */
   --cell-bg: #f0e5ff;
   --cell-fixed-bg: #e6d9ff;
-  --cell-selected-bg: rgba(33, 150, 243, 0.5);
-  --cell-highlight-bg: #e1c8ff;
+  --cell-selected-bg: #33006688;
+  --cell-highlight-bg: #ff00cc33;
   /* Sombras */
   --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.1);
   --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.2);
@@ -39,8 +41,8 @@
   --transition-fast: 0.15s ease;
   --transition-normal: 0.3s ease;
   --transition-slow: 0.5s ease;
+  --shadow-lg: 0 0 25px #ff00ccaa, 0 0 15px #00ffff88;
 }
-
 *,
 *::before,
 *::after {
@@ -48,7 +50,7 @@
   margin: 0;
   padding: 0;
 }
-
+/*Estilização geral do corpo do jogo*/
 body {
   font-family: 'Noto Sans JP', sans-serif;
   display: flex;
@@ -67,7 +69,6 @@ body {
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
 }
-
 /*Container principal*/
 .container {
   text-align: center;
@@ -76,7 +77,6 @@ body {
   margin: 0 auto;
   padding: 0;
 }
-
 /* Cabeçalho */
 .header-container {
   display: flex;
@@ -87,7 +87,6 @@ body {
   margin-bottom: 1.5rem;
   animation: fadeInTop 0.8s ease-in-out;
 }
-
 /* Título */
 h1 {
   font-family: 'Press Start 2P', monospace; /* fonte opcional estilo retrô */
@@ -101,7 +100,6 @@ h1 {
   text-shadow: 1px 1px 0 var(--dark-purple);
   filter: contrast(130%) brightness(120%) saturate(150%);
 }
-
 h1:hover {
   transform: scale(1.02);
   background-color: var(--white);
@@ -123,7 +121,6 @@ h1::after {
   pointer-events: none;
   z-index: 2;
 }
-
 /* Grade do Sudoku*/
 #sudoku-grid {
   display: grid;
@@ -138,8 +135,9 @@ h1::after {
   box-shadow: var(--shadow-lg);
   width: min(calc(100vw - 2rem), calc(95vh - 10rem));
   aspect-ratio: 1/1;
+  animation: neonFlow 8s ease infinite;
 }
-
+/* Celulas */
 .cell {
   width: 100%;
   aspect-ratio: 1;
@@ -152,74 +150,64 @@ h1::after {
   color: var(--black);
   transition: all var(--transition-normal);
 }
-
+/* Célular animadas de inícion */
 .cell.animated {
   animation: colorFlash 1.2s ease-in-out;
 }
-
+/* Células fixas */
 .cell.fixed {
   background-color: var(--cell-fixed-bg);
   color: var(--dark-purple);
   font-weight: 800;
 }
-
+/* Células selecionadas */
 .cell.selected {
   background-color: var(--cell-selected-bg);
   transform: scale(1.02);
   box-shadow: 0 0 8px var(--light-purple), 0 0 15px var(--light-purple);
   z-index: 1;
 }
-
 .cell.highlight {
   background-color: var(--cell-highlight-bg);
 }
-
 .cell.highlight-fixed {
   background-color: var(--primary-color);
   box-shadow: 0 0 0 2px var(--primary-color);
 }
-
 .cell.invalid {
   background-color: var(--error-color);
   color: var(--white);
   animation: shake 0.5s;
 }
-
 .cell:hover {
   background-color: var(--cell-bg);
   border-color: var(--primary-color);
 }
-
 .cell:focus {
   outline: none;
   box-shadow: 0 0 0 3px var(--dark-purple);
 }
-
 .cell:focus-visible {
   outline: 3px solid var(--dark-purple);
   outline-offset: 2px;
 }
-
 .cell::-webkit-outer-spin-button,
 .cell::-webkit-inner-spin-button {
   -webkit-appearance: none;
   margin: 0;
 }
-
+/* Bordas */
 .cell:nth-child(3n) {
   border-right: 3px solid var(--dark-purple);
 }
-
 .cell:nth-child(9n) {
   border-right: none;
 }
-
 .cell:nth-child(n+19):nth-child(-n+27),
 .cell:nth-child(n+46):nth-child(-n+54) {
   border-bottom: 3px solid var(--dark-purple);
 }
-
-/* Botões */
+/* Botões de controle de aúdio e controle do jogo*/
 #new-game-button,
 #solve-button,
 #hint-button {
@@ -236,7 +224,6 @@ h1::after {
   max-width: 200px;
   display: block;
 }
-
 #new-game-button:hover,
 #solve-button:hover,
 #hint-button:hover {
@@ -244,47 +231,6 @@ h1::after {
   background-color: var(--secondary-color);
   transform: scale(1.05);
 }
-
-.button {
-  padding: 0.75rem 1.5rem;
-  font-size: clamp(1rem, 4vw, 1.2rem);
-  color: var(--white);
-  background-color: var(--primary-color);
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: all var(--transition-normal);
-  box-shadow: var(--shadow-md);
-  font-weight: 600;
-}
-
-.button:hover,
-.button:focus-visible {
-  background-color: var(--secondary-color);
-  transform: translateY(-2px);
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
-}
-
-.button:active {
-  transform: translateY(0);
-}
-
-.button.secondary {
-  background-color: var(--yellow);
-  color: var(--black);
-}
-
-.button:disabled {
-  background-color: var(--gray);
-  cursor: not-allowed;
-  opacity: 0.6;
-}
-
-.button:focus-visible {
-  outline: 3px solid var(--light-yellow);
-  outline-offset: 2px;
-}
-
 #play-button {
   margin-left: 15px;
   padding: 12px 24px;
@@ -297,13 +243,11 @@ h1::after {
   transition: all 0.3s ease;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
 }
-
 #play-button:hover,
 #pause-button:hover {
   background-color: var(--secondary-color);
   transform: scale(1.05);
 }
-
 #pause-button {
   margin-left: 15px;
   padding: 12px 24px;
@@ -316,7 +260,7 @@ h1::after {
   transition: all 0.3s ease;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
 }
-
+/* Modals */
 .custom-modal {
   display: none;
   position: fixed;
