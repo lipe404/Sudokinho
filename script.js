@@ -124,6 +124,8 @@ document.addEventListener("DOMContentLoaded", () => {
         }
         if (emptyCells.length === 0) {
             showCustomAlert("O tabuleiro já está completo!");
+            solveButton.style.display = "none"; // Ocultar o botão de solução
+            hintButton.style.display = "none"; // Ocultar o botão de dica
             return;
         }
         // Escolher uma célula aleatória vazia
@@ -223,6 +225,8 @@ document.addEventListener("DOMContentLoaded", () => {
             clearInterval(timerInterval); // Limpa o cronômetro
             const finalTime = document.getElementById('timer').textContent; // Obtenha o tempo final
             showCustomAlert("Jogo Resolvido", "O jogo foi resolvido pela máquina.", "info");
+            solveButton.style.display = "none"; // Ocultar o botão de solução
+            hintButton.style.display = "none"; // Ocultar o botão de dica
         } else {
             showCustomAlert("Poxa", "Tenta de novo aí", "error");
         }
@@ -485,6 +489,8 @@ document.addEventListener("DOMContentLoaded", () => {
             clearInterval(timerInterval); // Limpa o cronômetro
             if (playerCompleted) {
                 message = `Parabéns! Você completou em ${document.getElementById('timer').textContent}!`; // Mensagem personalizada
+                solveButton.style.display = "none"; // Ocultar o botão de solução
+                hintButton.style.display = "none"; // Ocultar o botão de dica
             }
         }
         modalTitle.textContent = title; // Título do modal
@@ -510,6 +516,8 @@ document.addEventListener("DOMContentLoaded", () => {
             clearInterval(timerInterval); // Limpa o cronômetro
             const finalTime = document.getElementById('timer').textContent; // Tempo final
             showCustomAlert("Parabéns!", `Você completou o Sudoku corretamente em ${finalTime}!`, "success"); // Alerta de sucesso
+            solveButton.style.display = "none"; // Ocultar o botão de solução
+            hintButton.style.display = "none"; // Ocultar o botão de dica
             playerCompleted = true; // O jogador completou manualmente
         }
     }
