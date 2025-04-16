@@ -183,6 +183,14 @@ document.addEventListener("DOMContentLoaded", () => {
             grid.appendChild(cell); // Adiciona a célula à grade
         }
     }
+    // Função para ativar a célula
+    function enableCells() {
+        cells.forEach(cell => {
+            if (!cell.classList.contains("pre-filled")) {
+                cell.disabled = false;
+            }
+        });
+    }
     // Validação de entrada da célula
     function validateCellInput(e) {
         const value = e.target.value; // Valor digitado
@@ -297,6 +305,7 @@ document.addEventListener("DOMContentLoaded", () => {
         hideModal('difficultyModal'); // Fecha o modal
         resetGame(); // Reseta o jogo
         startTimer(); // Inicia o cronômetro
+        enableCells(); // Habilita as células
         newGameButton.disabled = false; // Ativa o botão de novo jogo
     }
     // Função para mostrar modais com transição
