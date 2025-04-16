@@ -30,7 +30,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const SIZE = 9; // Tamanho da grade do Sudoku (9x9)
     const SUBGRID_SIZE = 3; // Tamanho do subgrid (3x3)
     const MAX_ATTEMPTS = 300; // Tentativas para encontrar uma configuração jogável válida
-    const HINT_COOL_DOWN = 30000; // 30 segundos entre dicas
+    const HINT_COOL_DOWN = 60000; // 60 segundos entre dicas
     // Elementos DOM
     const grid = document.getElementById("sudoku-grid"); // Grid do Sudoku
     const solveButton = document.getElementById("solve-button"); // Botão de solução
