@@ -172,12 +172,13 @@ document.addEventListener("DOMContentLoaded", () => {
             cell.type = "text"; // Tipo texto
             cell.className = "cell"; // Classe de célula
             cell.maxLength = 1; // Máximo de 1 caractere
-            cell.dataset.index = i; // Índice da Celtula
+            cell.dataset.index = i; // Índice da celula
             cell.setAttribute("inputmode", "numeric"); // Modo numérico
             cell.setAttribute("pattern", "[1-9]*"); // Padrão de 1 a 9
             cell.addEventListener("input", validateCellInput); // Validação de entrada
             cell.addEventListener("click", highlightSameNumbers); // Destacar números iguais
             cell.addEventListener("focus", () => cell.select()); // Seleciona o input ao clicar
+            cell.disabled = true; // Desativa inicialmente
             cells.push(cell); // Adiciona a celula ao array
             grid.appendChild(cell); // Adiciona a célula à grade
         }
