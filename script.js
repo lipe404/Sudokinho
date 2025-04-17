@@ -177,7 +177,23 @@ document.addEventListener("DOMContentLoaded", () => {
             cell.setAttribute("pattern", "[1-9]*"); // Padrão de 1 a 9
             cell.addEventListener("input", validateCellInput); // Validação de entrada
             cell.addEventListener("click", highlightSameNumbers); // Destacar números iguais
-            cell.addEventListener("focus", () => cell.select()); // Seleciona o input ao clicar
+            cell.addEventListener("focus", () => {
+                if (!cell.disabled) {
+                    cell.select();
+                } else {
+                    cell.blur(); // opcional: tira o foco das células desativadas
+                }
+            }); // Seleciona o input ao clicar
+            cell.addEventListener("mousedown", (e) => {
+                if (cell.disabled) {
+                    e.preventDefault(); // Impede a seleção do conteúdo com o mouse
+                }
+            });
+            cell.addEventListener("touchstart", (e) => {
+                if (cell.disabled) {
+                    e.preventDefault(); // Evita zoom/touch highlight em célula fixa
+                }
+            });
             cell.disabled = true; // Desativa inicialmente
             cells.push(cell); // Adiciona a celula ao array
             grid.appendChild(cell); // Adiciona a célula à grade
