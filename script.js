@@ -179,8 +179,6 @@ document.addEventListener("DOMContentLoaded", () => {
             cell.addEventListener("click", highlightSameNumbers); // Destacar números iguais
             cell.addEventListener("focus", () => {
                 if (!cell.disabled) {
-                    cell.select();
-                } else {
                     cell.blur(); // opcional: tira o foco das células desativadas
                 }
             }); // Seleciona o input ao clicar
