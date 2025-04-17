@@ -179,18 +179,19 @@ document.addEventListener("DOMContentLoaded", () => {
             cell.addEventListener("click", highlightSameNumbers); // Destacar números iguais
             cell.addEventListener("focus", () => {
                 if (!cell.disabled) {
-                    cell.blur(); // opcional: tira o foco das células desativadas
-                }
-            }); // Seleciona o input ao clicar
-            cell.addEventListener("mousedown", (e) => {
-                if (cell.disabled) {
-                    e.preventDefault(); // Impede a seleção do conteúdo com o mouse
+                    // cell.select(); // Remova se não quiser seleção automática
+                } else {
+                    cell.blur();
                 }
             });
+            cell.addEventListener("mousedown", (e) => {
+                if (cell.disabled) e.preventDefault();
+            });
             cell.addEventListener("touchstart", (e) => {
-                if (cell.disabled) {
-                    e.preventDefault(); // Evita zoom/touch highlight em célula fixa
-                }
+                if (cell.disabled) e.preventDefault();
+            });
+            cell.addEventListener("selectstart", (e) => {
+                if (cell.disabled) e.preventDefault();
             });
             cell.disabled = true; // Desativa inicialmente
             cells.push(cell); // Adiciona a celula ao array
