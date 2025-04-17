@@ -141,6 +141,7 @@ h1::after {
 /* Celulas */
 .cell {
   user-select: none;
+  cursor: not-allowed;
   width: 100%;
   aspect-ratio: 1;
   text-align: center;
