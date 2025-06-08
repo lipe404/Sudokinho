@@ -7,10 +7,8 @@ export class Timer {
 
   start() {
     this.clear();
-    // ✨ MODIFICADO: Não resetar seconds se já tiver um valor (para restauração)
-    if (this.seconds === 0) {
-      this.updateDisplay();
-    }
+    this.seconds = 0; // ✅ SEMPRE resetar para novo jogo
+    this.updateDisplay();
 
     this.timerInterval = setInterval(() => {
       this.seconds++;
@@ -28,6 +26,14 @@ export class Timer {
     }, 1000);
   }
 
+  // ✨ NOVA FUNÇÃO: Restaurar timer com tempo específico
+  restoreAndStart(savedSeconds) {
+    this.clear();
+    this.seconds = savedSeconds;
+    this.updateDisplay();
+    this.resume(); // Usa resume para não resetar os seconds
+  }
+
   clear() {
     if (this.timerInterval) {
       clearInterval(this.timerInterval);
@@ -41,6 +47,13 @@ export class Timer {
       clearInterval(this.timerInterval);
       this.timerInterval = null;
     }
+  }
+
+  // ✨ NOVA FUNÇÃO: Reset completo
+  reset() {
+    this.clear();
+    this.seconds = 0;
+    this.updateDisplay();
   }
 
   updateDisplay() {

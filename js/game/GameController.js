@@ -99,11 +99,12 @@ export class GameController {
       cell.className = savedCell.classList.join(" ");
     });
 
-    // Restaurar timer
-    this.timer.seconds = this.previousGameState.seconds;
-    this.timer.updateDisplay();
+    // ✅ CORRIGIDO: Usar método específico para restaurar timer
     if (this.previousGameState.timerRunning) {
-      this.timer.start();
+      this.timer.restoreAndStart(this.previousGameState.seconds);
+    } else {
+      this.timer.seconds = this.previousGameState.seconds;
+      this.timer.updateDisplay();
     }
 
     // Restaurar visibilidade dos botões
