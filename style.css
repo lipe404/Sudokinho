@@ -37,7 +37,6 @@
   /* Sombras */
   --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.1);
   --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.2);
-  --shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.3);
   /* Transições */
   --transition-fast: 0.15s ease;
   --transition-normal: 0.3s ease;
@@ -59,7 +58,6 @@ body {
   align-items: center;
   min-height: 100vh;
   padding: 10px;
-  margin: 0;
   background: linear-gradient(135deg,
     var(--primary-color) 0%,
     var(--secondary-color) 35%,
@@ -76,7 +74,6 @@ body {
   width: 100%;
   max-width: 600px;
   margin: 0 auto;
-  padding: 0;
 }
 /* Cabeçalho */
 .header-container {
@@ -106,7 +103,6 @@ h1 {
 }
 h1:hover {
   transform: scale(1.02);
-  background-color: var(--white);
 }
 h1::after {
   content: "";
@@ -139,7 +135,6 @@ h1::after {
   box-shadow: var(--shadow-lg);
   width: min(calc(100vw - 2rem), calc(95vh - 10rem));
   aspect-ratio: 1/1;
-  animation: neonFlow 8s ease infinite;
 }
 /* Celulas */
 .cell {
@@ -200,7 +195,6 @@ h1::after {
 .cell::-webkit-outer-spin-button,
 .cell::-webkit-inner-spin-button {
   -webkit-appearance: none;
-  margin: 0;
 }
 /* Estilo para células com dica */
 .cell.hint {
@@ -230,8 +224,11 @@ h1::after {
   padding: 14px 20px;
   font-size: clamp(1rem, 4vw, 1.2rem);
   color: var(--white);
-  background-color: var(--primary-color);
   border: none;
+  -webkit-border-radius: 12px;
+  -moz-border-radius: 12px;
+  -ms-border-radius: 12px;
+  -o-border-radius: 12px;
   border-radius: 12px;
   cursor: pointer;
   text-transform: uppercase;
@@ -244,10 +241,6 @@ h1::after {
     var(--secondary-color)
   );
   background-size: 400% 400%;
-  -webkit-border-radius: 12px;
-  -moz-border-radius: 12px;
-  -ms-border-radius: 12px;
-  -o-border-radius: 12px;
   transition: all var(--transition-normal);
 }
 #new-game-button:hover,
@@ -332,7 +325,6 @@ audio{
   position: absolute;
   width: 1px;
   height: 1px;
-  padding: 0;
   margin: -1px;
   overflow: hidden;
   clip: rect(0, 0, 0, 0);
@@ -394,16 +386,6 @@ audio{
   opacity: 0;
   pointer-events: none;
 }
-/* Melhorias para mobile */
-@media (max-width: 480px) {
-  .cell.selected {
-      box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.7) !important;
-  }
-
-  .cell.highlight, .cell.highlight-fixed {
-      box-shadow: 0 0 0 1px rgba(0,0,0,0.3);
-  }
-}
 /* ===== MEDIA QUERIES ===== */
 @media (max-width: 480px) {
   body {
@@ -416,6 +398,13 @@ audio{
   }
   .cell {
       font-size: clamp(0.8rem, 4.5vw, 1.2rem);
+  }
+  .cell.selected {
+      box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.7);
+  }
+
+  .cell.highlight, .cell.highlight-fixed {
+      box-shadow: 0 0 0 1px rgba(0,0,0,0.3);
   }
   #solve-button {
       max-width: none;
@@ -445,11 +434,6 @@ audio{
 @keyframes slideIn {
   from { transform: translateY(20px); opacity: 0; }
   to { transform: translateY(0); opacity: 1; }
-}
-@keyframes hintPulse {
-  0% { transform: scale(1); background-color: #d8a4ff; }
-  50% { transform: scale(1.1); background-color: #e1c8ff; }
-  100% { transform: scale(1); background-color: #d8a4ff; }
 }
 /* Animação para o container de cabeçalho */
 @keyframes fadeInTop {
