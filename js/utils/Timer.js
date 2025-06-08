@@ -7,8 +7,20 @@ export class Timer {
 
   start() {
     this.clear();
-    this.seconds = 0;
-    this.updateDisplay();
+    // ✨ MODIFICADO: Não resetar seconds se já tiver um valor (para restauração)
+    if (this.seconds === 0) {
+      this.updateDisplay();
+    }
+
+    this.timerInterval = setInterval(() => {
+      this.seconds++;
+      this.updateDisplay();
+    }, 1000);
+  }
+
+  // ✨ NOVA FUNÇÃO: Continuar timer do ponto atual
+  resume() {
+    if (this.timerInterval) return; // Já está rodando
 
     this.timerInterval = setInterval(() => {
       this.seconds++;
@@ -17,6 +29,14 @@ export class Timer {
   }
 
   clear() {
+    if (this.timerInterval) {
+      clearInterval(this.timerInterval);
+      this.timerInterval = null;
+    }
+  }
+
+  // ✨ NOVA FUNÇÃO: Pausar sem limpar o tempo
+  pause() {
     if (this.timerInterval) {
       clearInterval(this.timerInterval);
       this.timerInterval = null;

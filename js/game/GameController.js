@@ -16,6 +16,8 @@ export class GameController {
     this.timer = new Timer();
     this.animationManager = new AnimationManager(this.gameState);
 
+    this.previousGameState = null;
+
     this.setupEventListeners();
   }
 
@@ -44,27 +46,172 @@ export class GameController {
     const grid = document.getElementById("sudoku-grid");
     grid.classList.remove("grid-animation");
 
+    this.saveCurrentGameState();
+
     this.gameState.animacaoAtiva = false;
     this.showDifficultyModal();
+  }
+
+  // Salvar estado atual do jogo
+  saveCurrentGameState() {
+    this.previousGameState = {
+      currentBoard: this.gameState.currentBoard.map((row) => [...row]),
+      solutionBoard: this.gameState.solutionBoard.map((row) => [...row]),
+      currentDifficulty: { ...this.gameState.currentDifficulty },
+      seconds: this.timer.seconds,
+      playerCompleted: this.gameState.playerCompleted,
+      lastHintTime: this.gameState.lastHintTime,
+      cellsValues: this.gameState.cells.map((cell) => ({
+        value: cell.value,
+        disabled: cell.disabled,
+        classList: Array.from(cell.classList),
+      })),
+      timerRunning: this.timer.timerInterval !== null,
+      gameButtonsVisible: {
+        solve: document.getElementById("solve-button").style.display !== "none",
+        hint: document.getElementById("hint-button").style.display !== "none",
+      },
+    };
+  }
+
+  // Restaurar estado anterior
+  restorePreviousGameState() {
+    if (!this.previousGameState) return;
+
+    // Restaurar dados do gameState
+    this.gameState.currentBoard = this.previousGameState.currentBoard.map(
+      (row) => [...row]
+    );
+    this.gameState.solutionBoard = this.previousGameState.solutionBoard.map(
+      (row) => [...row]
+    );
+    this.gameState.currentDifficulty = {
+      ...this.previousGameState.currentDifficulty,
+    };
+    this.gameState.playerCompleted = this.previousGameState.playerCompleted;
+    this.gameState.lastHintTime = this.previousGameState.lastHintTime;
+
+    // Restaurar células
+    this.gameState.cells.forEach((cell, index) => {
+      const savedCell = this.previousGameState.cellsValues[index];
+      cell.value = savedCell.value;
+      cell.disabled = savedCell.disabled;
+      cell.className = savedCell.classList.join(" ");
+    });
+
+    // Restaurar timer
+    this.timer.seconds = this.previousGameState.seconds;
+    this.timer.updateDisplay();
+    if (this.previousGameState.timerRunning) {
+      this.timer.start();
+    }
+
+    // Restaurar visibilidade dos botões
+    document.getElementById("solve-button").style.display = this
+      .previousGameState.gameButtonsVisible.solve
+      ? "inline-block"
+      : "none";
+    document.getElementById("hint-button").style.display = this
+      .previousGameState.gameButtonsVisible.hint
+      ? "inline-block"
+      : "none";
+
+    // Reabilitar botão de novo jogo
+    document.getElementById("new-game-button").disabled = false;
+
+    // Limpar estado salvo
+    this.previousGameState = null;
   }
 
   showDifficultyModal() {
     this.modalManager.showModal("difficultyModal");
     const buttons = document.querySelectorAll(".difficulty-btn");
+    // MODIFICADO: Remover listeners anteriores e adicionar novos
     buttons.forEach((button) => {
-      button.addEventListener(
-        "click",
-        (event) => this.handleDifficultySelection(event),
-        { once: true }
+      // Remove listeners anteriores se existirem
+      const newButton = button.cloneNode(true);
+      button.parentNode.replaceChild(newButton, button);
+    });
+
+    // Adicionar novos listeners
+    const newButtons = document.querySelectorAll(".difficulty-btn");
+    newButtons.forEach((button) => {
+      button.addEventListener("click", (event) =>
+        this.handleDifficultySelection(event)
       );
     });
+
+    // NOVO: Adicionar listener para fechar modal clicando fora
+    this.setupDifficultyModalCloseHandler();
+  }
+
+  // ✨ NOVA FUNÇÃO: Configurar fechamento do modal de dificuldade
+  setupDifficultyModalCloseHandler() {
+    const modal = document.getElementById("difficultyModal");
+
+    // Função para fechar modal e restaurar estado
+    const closeModalHandler = (event) => {
+      // Verifica se clicou fora do conteúdo do modal
+      if (event.target === modal) {
+        this.cancelDifficultySelection();
+      }
+    };
+
+    // Função para ESC key
+    const escKeyHandler = (event) => {
+      if (event.key === "Escape") {
+        this.cancelDifficultySelection();
+      }
+    };
+
+    // Adicionar listeners temporários
+    modal.addEventListener("click", closeModalHandler);
+    document.addEventListener("keydown", escKeyHandler);
+
+    // Armazenar referências para remoção posterior
+    modal._closeHandler = closeModalHandler;
+    modal._escHandler = escKeyHandler;
+  }
+
+  // ✨ NOVA FUNÇÃO: Cancelar seleção de dificuldade
+  cancelDifficultySelection() {
+    // Remover listeners temporários
+    const modal = document.getElementById("difficultyModal");
+    if (modal._closeHandler) {
+      modal.removeEventListener("click", modal._closeHandler);
+      delete modal._closeHandler;
+    }
+    if (modal._escHandler) {
+      document.removeEventListener("keydown", modal._escHandler);
+      delete modal._escHandler;
+    }
+
+    // Fechar modal
+    this.modalManager.hideModal("difficultyModal");
+
+    // Restaurar estado anterior
+    this.restorePreviousGameState();
   }
 
   handleDifficultySelection(event) {
+    const modal = document.getElementById("difficultyModal");
+    if (modal._closeHandler) {
+      modal.removeEventListener("click", modal._closeHandler);
+      delete modal._closeHandler;
+    }
+    if (modal._escHandler) {
+      document.removeEventListener("keydown", modal._escHandler);
+      delete modal._escHandler;
+    }
+
     const difficulty = event.target.getAttribute("data-difficulty");
     this.gameState.currentDifficulty =
       this.gameState.DIFFICULTY_LEVELS[difficulty];
     this.modalManager.hideModal("difficultyModal");
+
+    // ✨ MODIFICADO: Limpar estado anterior já que o usuário confirmou
+    this.previousGameState = null;
+
     this.resetGame();
     this.timer.start();
     this.gridManager.enableCells();
