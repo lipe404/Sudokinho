@@ -17,7 +17,9 @@ export class GridManager {
       cell.setAttribute("inputmode", "numeric");
       cell.setAttribute("pattern", "[1-9]*");
 
+      // ✨ NOVO: Adicionar eventos para sobreposição automática
       cell.addEventListener("input", (e) => this.validateCellInput(e));
+      cell.addEventListener("keydown", (e) => this.handleKeyDown(e));
       cell.addEventListener("click", (e) => this.highlightSameNumbers(e));
       cell.addEventListener("focus", () => this.handleCellFocus(cell));
       cell.addEventListener("mousedown", (e) =>
@@ -36,15 +38,57 @@ export class GridManager {
     }
   }
 
+  // ✨ NOVA FUNÇÃO: Manipular teclas pressionadas
+  handleKeyDown(e) {
+    const cell = e.target;
+    
+    // Se a célula está desabilitada, não fazer nada
+    if (cell.disabled) {
+      e.preventDefault();
+      return;
+    }
+
+    // Verificar se é um número de 1-9
+    if (/^[1-9]$/.test(e.key)) {
+      // ✨ SOBREPOSIÇÃO AUTOMÁTICA: Limpar o valor atual antes de digitar o novo
+      e.preventDefault(); // Prevenir o comportamento padrão
+      cell.value = e.key; // Definir diretamente o novo valor
+      
+      // Disparar evento de input manualmente para validação e destaque
+      const inputEvent = new Event('input', { bubbles: true });
+      cell.dispatchEvent(inputEvent);
+      
+      return;
+    }
+    
+    // Permitir teclas de navegação e controle
+    const allowedKeys = [
+      'Backspace', 'Delete', 'Tab', 'Escape', 'Enter',
+      'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown',
+      'Home', 'End'
+    ];
+    
+    if (!allowedKeys.includes(e.key)) {
+      e.preventDefault(); // Bloquear outras teclas
+    }
+  }
+
   validateCellInput(e) {
     const value = e.target.value;
-    if (value && !/^[1-9]$/.test(value)) {
+    
+    // Se o valor tem mais de 1 caractere (não deveria acontecer, mas por segurança)
+    if (value.length > 1) {
+      e.target.value = value.slice(-1); // Manter apenas o último caractere
+    }
+    
+    // Validar se é um número válido
+    if (e.target.value && !/^[1-9]$/.test(e.target.value)) {
       e.target.value = "";
       this.clearHighlights();
     } else {
       this.validator.checkIfPlayerCompletedBoard();
-      // ✨ NOVO: Destacar números iguais automaticamente após digitar
-      if (value) {
+      // Destacar números iguais automaticamente após digitar
+      if (e.target.value) {
         this.highlightSameNumbers(e);
       } else {
         // Se apagou o número, limpar destaques
@@ -53,7 +97,22 @@ export class GridManager {
     }
   }
 
-  // ✨ NOVA FUNÇÃO: Limpar todos os destaques
+  // ✨ FUNÇÃO MELHORADA: Seleção automática ao focar
+  handleCellFocus(cell) {
+    if (cell.disabled) {
+      cell.blur();
+    } else {
+      // ✨ NOVO: Selecionar todo o conteúdo ao focar (facilita sobreposição)
+      setTimeout(() => {
+        if (cell.value) {
+          cell.select(); // Seleciona o texto para facilitar sobreposição
+          this.highlightNumbersByValue(cell.value, cell);
+        }
+      }, 0);
+    }
+  }
+
+  // Função para limpar todos os destaques
   clearHighlights() {
     this.gameState.cells.forEach((c) => {
       c.classList.remove("highlight", "selected", "highlight-fixed");
@@ -63,12 +122,8 @@ export class GridManager {
   }
 
   highlightSameNumbers(e) {
+    // Limpar destaques anteriores
     this.clearHighlights();
-    this.gameState.cells.forEach((c) => {
-      c.classList.remove("highlight", "selected", "highlight-fixed");
-      c.style.backgroundColor = "";
-      c.style.boxShadow = "";
-    });
 
     const clickedCell = e.target;
     const clickedValue = clickedCell.value;
@@ -92,7 +147,7 @@ export class GridManager {
     });
   }
 
-  // ✨ NOVA FUNÇÃO: Destacar números baseado em valor específico
+  // Função para destacar números baseado em valor específico
   highlightNumbersByValue(value, activeCell = null) {
     // Limpar destaques anteriores
     this.clearHighlights();
@@ -117,17 +172,6 @@ export class GridManager {
         }
       }
     });
-  }
-
-  handleCellFocus(cell) {
-    if (cell.disabled) {
-      cell.blur();
-    } else {
-      // ✨ NOVO: Destacar números iguais ao focar na célula
-      if (cell.value) {
-        this.highlightNumbersByValue(cell.value, cell);
-      }
-    }
   }
 
   handleCellMouseDown(e, cell) {
@@ -189,7 +233,9 @@ export class GridManager {
   clearAllCells() {
     this.gameState.cells.forEach((cell) => {
       cell.value = "";
-      cell.classList.remove("fixed", "invalid");
+      cell.classList.remove("fixed", "invalid", "highlight", "selected", "highlight-fixed");
+      cell.style.backgroundColor = "";
+      cell.style.boxShadow = "";
       cell.disabled = false;
     });
   }
