@@ -40,12 +40,30 @@ export class GridManager {
     const value = e.target.value;
     if (value && !/^[1-9]$/.test(value)) {
       e.target.value = "";
+      this.clearHighlights();
     } else {
       this.validator.checkIfPlayerCompletedBoard();
+      // ✨ NOVO: Destacar números iguais automaticamente após digitar
+      if (value) {
+        this.highlightSameNumbers(e);
+      } else {
+        // Se apagou o número, limpar destaques
+        this.clearHighlights();
+      }
     }
   }
 
+  // ✨ NOVA FUNÇÃO: Limpar todos os destaques
+  clearHighlights() {
+    this.gameState.cells.forEach((c) => {
+      c.classList.remove("highlight", "selected", "highlight-fixed");
+      c.style.backgroundColor = "";
+      c.style.boxShadow = "";
+    });
+  }
+
   highlightSameNumbers(e) {
+    this.clearHighlights();
     this.gameState.cells.forEach((c) => {
       c.classList.remove("highlight", "selected", "highlight-fixed");
       c.style.backgroundColor = "";
@@ -74,9 +92,41 @@ export class GridManager {
     });
   }
 
+  // ✨ NOVA FUNÇÃO: Destacar números baseado em valor específico
+  highlightNumbersByValue(value, activeCell = null) {
+    // Limpar destaques anteriores
+    this.clearHighlights();
+
+    if (!value) return;
+
+    // Marcar célula ativa se fornecida
+    if (activeCell) {
+      activeCell.classList.add("selected");
+    }
+
+    this.gameState.cells.forEach((cell) => {
+      if (cell.value === value) {
+        if (cell.classList.contains("fixed")) {
+          cell.classList.add("highlight-fixed");
+          cell.style.backgroundColor = "#d8a4ff";
+          cell.style.boxShadow = "0 0 0 2px #8436c7";
+        } else {
+          cell.classList.add("highlight");
+          cell.style.backgroundColor = "#d8a4ff";
+          cell.style.boxShadow = "0 0 0 2px #8436c7";
+        }
+      }
+    });
+  }
+
   handleCellFocus(cell) {
     if (cell.disabled) {
       cell.blur();
+    } else {
+      // ✨ NOVO: Destacar números iguais ao focar na célula
+      if (cell.value) {
+        this.highlightNumbersByValue(cell.value, cell);
+      }
     }
   }
 
