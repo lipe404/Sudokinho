@@ -260,6 +260,9 @@ h1::after {
   background-color: var(--secondary-color);
   transform: scale(1.05);
 }
+#pause-button{
+  display: none; /* Escondido por padrão, será exibido quando o jogo estiver em execução */
+}
 /* Estilização personalizada para cada botão -- para adicionar se preferir
 #play-button {
   background: linear-gradient(135deg, #00ffff, #ff00cc);
@@ -320,6 +323,9 @@ h1::after {
   cursor: pointer;
   font-weight: 700;
   transition: all var(--transition-normal);
+}
+audio{
+  display: none;
 }
 /* Acessibilidade */
 .sr-only {
