@@ -41,9 +41,9 @@ export class GridManager {
   // ✨ NOVA FUNÇÃO: Manipular teclas pressionadas
   handleKeyDown(e) {
     const cell = e.target;
-    
+
     // Se a célula está desabilitada, não fazer nada
-    if (cell.disabled) {
+    if (cell.disabled || cell.classList.contains("fixed")) {
       e.preventDefault();
       return;
     }
@@ -53,21 +53,29 @@ export class GridManager {
       // ✨ SOBREPOSIÇÃO AUTOMÁTICA: Limpar o valor atual antes de digitar o novo
       e.preventDefault(); // Prevenir o comportamento padrão
       cell.value = e.key; // Definir diretamente o novo valor
-      
+
       // Disparar evento de input manualmente para validação e destaque
-      const inputEvent = new Event('input', { bubbles: true });
+      const inputEvent = new Event("input", { bubbles: true });
       cell.dispatchEvent(inputEvent);
-      
+
       return;
     }
-    
+
     // Permitir teclas de navegação e controle
     const allowedKeys = [
-      'Backspace', 'Delete', 'Tab', 'Escape', 'Enter',
-      'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown',
-      'Home', 'End'
+      "Backspace",
+      "Delete",
+      "Tab",
+      "Escape",
+      "Enter",
+      "ArrowLeft",
+      "ArrowRight",
+      "ArrowUp",
+      "ArrowDown",
+      "Home",
+      "End",
     ];
-    
+
     if (!allowedKeys.includes(e.key)) {
       e.preventDefault(); // Bloquear outras teclas
     }
@@ -75,12 +83,12 @@ export class GridManager {
 
   validateCellInput(e) {
     const value = e.target.value;
-    
+
     // Se o valor tem mais de 1 caractere (não deveria acontecer, mas por segurança)
     if (value.length > 1) {
       e.target.value = value.slice(-1); // Manter apenas o último caractere
     }
-    
+
     // Validar se é um número válido
     if (e.target.value && !/^[1-9]$/.test(e.target.value)) {
       e.target.value = "";
@@ -233,7 +241,13 @@ export class GridManager {
   clearAllCells() {
     this.gameState.cells.forEach((cell) => {
       cell.value = "";
-      cell.classList.remove("fixed", "invalid", "highlight", "selected", "highlight-fixed");
+      cell.classList.remove(
+        "fixed",
+        "invalid",
+        "highlight",
+        "selected",
+        "highlight-fixed"
+      );
       cell.style.backgroundColor = "";
       cell.style.boxShadow = "";
       cell.disabled = false;
