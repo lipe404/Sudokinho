@@ -18,9 +18,9 @@
     </head>
     <body>
         <!--Conteúdo principal-->
-        <div class="container">
+        <main class="container">
             <!--Cabeçalho-->
-            <div class="header-container">
+            <header class="header-container">
                 <h1>SUDOKINHO</h1>
                 <!--Controles de áudio-->
                 <div class="audio-controls">
@@ -33,18 +33,18 @@
                 </div>
                 <!--Temporizador-->
                 <div id="timer" aria-label="Tempo" role="timer">00:00</div>
-            </div>
+            </header>
 
             <!--Grade do Sudoku-->
             <div id="sudoku-grid"></div>
 
             <!--Controles do jogo-->
-            <div class="footer-container">
+            <footer class="footer-container">
                 <button id="new-game-button" aria-label="Novo Jogo">Novo Jogo</button>
                 <button id="solve-button" aria-label="Resolver o Sudoku">Resolver</button>
                 <button id="hint-button" aria-label="Obter uma dica" class="secondary-button">Dica</button>
-            </div>
-        </div>
+            </footer>
+        </main>
 
         <!--Modal de mensagem-->
         <div id="customModal" class="custom-modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle" aria-describedby="modalMessage">
@@ -73,8 +73,8 @@
             Seu navegador não suporta o elemento de áudio.
         </audio>
 
-        <script src="script.js"></script>
-
         <div class="sr-only" aria-live="polite" id="a11y-announcement"></div>
+
+        <script src="script.js" defer></script>
     </body>
 </html>

@@ -1,7 +1,7 @@
 /* Estilização geral do jogo Sudoku
   Autor: Felipe Toledo
-  Versão: 2.0
-  Data: 15-04-2025
+  Versão: 2.1
+  Data: 08-06-2025
   Descrição: Este código contém a estilização do jogo Sudoku, incluindo cores, fontes, animações e responsividade.
   O design é inspirado em temas de jogos retrô e utiliza uma paleta de cores vibrantes para criar uma experiência visual envolvente.
   O código é organizado em seções para facilitar a leitura e manutenção, com comentários explicativos para cada parte.
@@ -90,16 +90,19 @@ body {
 }
 /* Título */
 h1 {
-  font-family: 'Press Start 2P', monospace; /* fonte opcional estilo retrô */
+  font-family: 'Press Start 2P', monospace;
+  /* fonte opcional estilo retrô */
   letter-spacing: 10px;
   font-size: clamp(2.5rem, 4vw, 2rem);
   background: linear-gradient(90deg,#ff00cc,#3333ff,#00ffff,#ff00cc);
   background-size: 400% 100%;
-  animation: gradientMove 6s ease infinite;
   -webkit-background-clip: text;
+  background-clip: text; /* Compatibilidade */
   -webkit-text-fill-color: transparent;
   text-shadow: 1px 1px 0 var(--dark-purple);
   filter: contrast(130%) brightness(120%) saturate(150%);
+  -webkit-animation: gradientMove 6s ease infinite;
+  animation: gradientMove 6s ease infinite;
 }
 h1:hover {
   transform: scale(1.02);
@@ -140,6 +143,7 @@ h1::after {
 }
 /* Celulas */
 .cell {
+  -webkit-user-select: none;
   user-select: none;
   width: 100%;
   aspect-ratio: 1;
@@ -286,7 +290,9 @@ h1::after {
   z-index: 1000;
   justify-content: center;
   align-items: center;
+  -webkit-backdrop-filter: blur(8px);
   backdrop-filter: blur(8px);
+  -webkit-animation: fadeIn var(--transition-normal);
   animation: fadeIn var(--transition-normal);
 }
 .modal-content {
