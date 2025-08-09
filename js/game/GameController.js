@@ -3,6 +3,7 @@ import { SudokuGenerator } from "./SudokuGenerator.js";
 import { GridManager } from "../ui/GridManager.js";
 import { ModalManager } from "../ui/ModalManager.js";
 import { AudioController } from "../ui/AudioController.js";
+import { ImageMode } from "../ui/ImageMode.js"; // NOVO IMPORT
 import { Timer } from "../utils/Timer.js";
 import { AnimationManager } from "../animations/AnimationManager.js";
 
@@ -13,6 +14,7 @@ export class GameController {
     this.gridManager = new GridManager(this.gameState);
     this.modalManager = new ModalManager();
     this.audioController = new AudioController();
+    this.imageMode = new ImageMode(this.gameState); // NOVA INSTÂNCIA
     this.timer = new Timer();
     this.animationManager = new AnimationManager(this.gameState);
 
@@ -33,10 +35,22 @@ export class GameController {
     const solveButton = document.getElementById("solve-button");
     const newGameButton = document.getElementById("new-game-button");
     const hintButton = document.getElementById("hint-button");
+    const imageModeButton = document.getElementById("image-mode-button"); // NOVO
 
     solveButton.addEventListener("click", () => this.solveSudoku());
     newGameButton.addEventListener("click", () => this.startNewGame());
     hintButton.addEventListener("click", () => this.provideHint());
+
+    // NOVO EVENT LISTENER
+    imageModeButton.addEventListener("click", () => this.toggleImageMode());
+  }
+
+  // NOVA FUNÇÃO
+  toggleImageMode() {
+    this.imageMode.toggleMode();
+
+    // Atualizar GridManager para saber sobre o modo atual
+    this.gridManager.setImageMode(this.imageMode);
   }
 
   startNewGame() {
@@ -52,7 +66,7 @@ export class GameController {
     this.showDifficultyModal();
   }
 
-  // Salvar estado atual do jogo
+  // Salvar estado atual do jogo (ATUALIZADO)
   saveCurrentGameState() {
     this.previousGameState = {
       currentBoard: this.gameState.currentBoard.map((row) => [...row]),
@@ -61,10 +75,13 @@ export class GameController {
       seconds: this.timer.seconds,
       playerCompleted: this.gameState.playerCompleted,
       lastHintTime: this.gameState.lastHintTime,
+      isImageMode: this.imageMode.getCurrentMode(), // NOVO
       cellsValues: this.gameState.cells.map((cell) => ({
         value: cell.value,
         disabled: cell.disabled,
         classList: Array.from(cell.classList),
+        dataValue: cell.getAttribute("data-value"), // NOVO
+        backgroundImage: cell.style.backgroundImage, // NOVO
       })),
       timerRunning: this.timer.timerInterval !== null,
       gameButtonsVisible: {
@@ -74,7 +91,7 @@ export class GameController {
     };
   }
 
-  // Restaurar estado anterior
+  // Restaurar estado anterior (ATUALIZADO)
   restorePreviousGameState() {
     if (!this.previousGameState) return;
 
@@ -91,15 +108,26 @@ export class GameController {
     this.gameState.playerCompleted = this.previousGameState.playerCompleted;
     this.gameState.lastHintTime = this.previousGameState.lastHintTime;
 
-    // Restaurar células
+    // NOVO: Restaurar modo de imagem
+    this.imageMode.setMode(this.previousGameState.isImageMode);
+
+    // Restaurar células (ATUALIZADO)
     this.gameState.cells.forEach((cell, index) => {
       const savedCell = this.previousGameState.cellsValues[index];
       cell.value = savedCell.value;
       cell.disabled = savedCell.disabled;
       cell.className = savedCell.classList.join(" ");
+
+      // NOVO: Restaurar atributos de imagem
+      if (savedCell.dataValue) {
+        cell.setAttribute("data-value", savedCell.dataValue);
+      }
+      if (savedCell.backgroundImage) {
+        cell.style.backgroundImage = savedCell.backgroundImage;
+      }
     });
 
-    // ✅ CORRIGIDO: Usar método específico para restaurar timer
+    // Usar método específico para restaurar timer
     if (this.previousGameState.timerRunning) {
       this.timer.restoreAndStart(this.previousGameState.seconds);
     } else {
@@ -124,17 +152,15 @@ export class GameController {
     this.previousGameState = null;
   }
 
+  // Resto do código permanece igual...
   showDifficultyModal() {
     this.modalManager.showModal("difficultyModal");
     const buttons = document.querySelectorAll(".difficulty-btn");
-    // MODIFICADO: Remover listeners anteriores e adicionar novos
     buttons.forEach((button) => {
-      // Remove listeners anteriores se existirem
       const newButton = button.cloneNode(true);
       button.parentNode.replaceChild(newButton, button);
     });
 
-    // Adicionar novos listeners
     const newButtons = document.querySelectorAll(".difficulty-btn");
     newButtons.forEach((button) => {
       button.addEventListener("click", (event) =>
@@ -142,41 +168,32 @@ export class GameController {
       );
     });
 
-    // NOVO: Adicionar listener para fechar modal clicando fora
     this.setupDifficultyModalCloseHandler();
   }
 
-  // ✨ NOVA FUNÇÃO: Configurar fechamento do modal de dificuldade
   setupDifficultyModalCloseHandler() {
     const modal = document.getElementById("difficultyModal");
 
-    // Função para fechar modal e restaurar estado
     const closeModalHandler = (event) => {
-      // Verifica se clicou fora do conteúdo do modal
       if (event.target === modal) {
         this.cancelDifficultySelection();
       }
     };
 
-    // Função para ESC key
     const escKeyHandler = (event) => {
       if (event.key === "Escape") {
         this.cancelDifficultySelection();
       }
     };
 
-    // Adicionar listeners temporários
     modal.addEventListener("click", closeModalHandler);
     document.addEventListener("keydown", escKeyHandler);
 
-    // Armazenar referências para remoção posterior
     modal._closeHandler = closeModalHandler;
     modal._escHandler = escKeyHandler;
   }
 
-  // ✨ NOVA FUNÇÃO: Cancelar seleção de dificuldade
   cancelDifficultySelection() {
-    // Remover listeners temporários
     const modal = document.getElementById("difficultyModal");
     if (modal._closeHandler) {
       modal.removeEventListener("click", modal._closeHandler);
@@ -187,10 +204,7 @@ export class GameController {
       delete modal._escHandler;
     }
 
-    // Fechar modal
     this.modalManager.hideModal("difficultyModal");
-
-    // Restaurar estado anterior
     this.restorePreviousGameState();
   }
 
@@ -210,7 +224,6 @@ export class GameController {
       this.gameState.DIFFICULTY_LEVELS[difficulty];
     this.modalManager.hideModal("difficultyModal");
 
-    // ✨ MODIFICADO: Limpar estado anterior já que o usuário confirmou
     this.previousGameState = null;
 
     this.resetGame();
@@ -242,6 +255,9 @@ export class GameController {
     this.gridManager.fillCells(this.gameState.currentBoard);
     this.showGameButtons();
     this.gameState.animacaoAtiva = false;
+
+    // NOVO: Atualizar display baseado no modo atual
+    this.imageMode.updateAllCells();
   }
 
   solveSudoku() {
@@ -259,6 +275,10 @@ export class GameController {
 
     if (this.sudokuGenerator.solveSudoku(boardToSolve)) {
       this.gridManager.updateCellsFromBoard(boardToSolve);
+
+      // NOVO: Atualizar display após resolver
+      this.imageMode.updateAllCells();
+
       this.timer.clear();
       this.modalManager.showCustomAlert(
         "Jogo Resolvido",
@@ -306,6 +326,10 @@ export class GameController {
     const col = randomIndex % this.gameState.SIZE;
 
     cell.value = this.gameState.solutionBoard[row][col];
+
+    // NOVO: Atualizar display da célula com dica
+    this.imageMode.updateCellDisplay(cell);
+
     this.animationManager.animateHint(cell);
     this.gameState.lastHintTime = now;
   }

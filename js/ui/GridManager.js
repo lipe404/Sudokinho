@@ -5,6 +5,12 @@ export class GridManager {
     this.gameState = gameState;
     this.validator = new Validator(gameState);
     this.grid = document.getElementById("sudoku-grid");
+    this.imageMode = null; // NOVO
+  }
+
+  // NOVA FUNÇÃO
+  setImageMode(imageMode) {
+    this.imageMode = imageMode;
   }
 
   createGrid() {
@@ -17,7 +23,6 @@ export class GridManager {
       cell.setAttribute("inputmode", "numeric");
       cell.setAttribute("pattern", "[1-9]*");
 
-      // ✨ NOVO: Adicionar eventos para sobreposição automática
       cell.addEventListener("input", (e) => this.validateCellInput(e));
       cell.addEventListener("keydown", (e) => this.handleKeyDown(e));
       cell.addEventListener("click", (e) => this.highlightSameNumbers(e));
@@ -38,30 +43,29 @@ export class GridManager {
     }
   }
 
-  // ✨ NOVA FUNÇÃO: Manipular teclas pressionadas
   handleKeyDown(e) {
     const cell = e.target;
 
-    // Se a célula está desabilitada, não fazer nada
     if (cell.disabled || cell.classList.contains("fixed")) {
       e.preventDefault();
       return;
     }
 
-    // Verificar se é um número de 1-9
     if (/^[1-9]$/.test(e.key)) {
-      // ✨ SOBREPOSIÇÃO AUTOMÁTICA: Limpar o valor atual antes de digitar o novo
-      e.preventDefault(); // Prevenir o comportamento padrão
-      cell.value = e.key; // Definir diretamente o novo valor
+      e.preventDefault();
+      cell.value = e.key;
 
-      // Disparar evento de input manualmente para validação e destaque
+      // NOVO: Atualizar display se estiver no modo de imagem
+      if (this.imageMode) {
+        this.imageMode.updateCellDisplay(cell);
+      }
+
       const inputEvent = new Event("input", { bubbles: true });
       cell.dispatchEvent(inputEvent);
 
       return;
     }
 
-    // Permitir teclas de navegação e controle
     const allowedKeys = [
       "Backspace",
       "Delete",
@@ -77,50 +81,53 @@ export class GridManager {
     ];
 
     if (!allowedKeys.includes(e.key)) {
-      e.preventDefault(); // Bloquear outras teclas
+      e.preventDefault();
     }
   }
 
   validateCellInput(e) {
     const value = e.target.value;
 
-    // Se o valor tem mais de 1 caractere (não deveria acontecer, mas por segurança)
     if (value.length > 1) {
-      e.target.value = value.slice(-1); // Manter apenas o último caractere
+      e.target.value = value.slice(-1);
     }
 
-    // Validar se é um número válido
     if (e.target.value && !/^[1-9]$/.test(e.target.value)) {
       e.target.value = "";
       this.clearHighlights();
+
+      // NOVO: Limpar display de imagem se necessário
+      if (this.imageMode) {
+        this.imageMode.updateCellDisplay(e.target);
+      }
     } else {
+      // NOVO: Atualizar display após validação
+      if (this.imageMode) {
+        this.imageMode.updateCellDisplay(e.target);
+      }
+
       this.validator.checkIfPlayerCompletedBoard();
-      // Destacar números iguais automaticamente após digitar
       if (e.target.value) {
         this.highlightSameNumbers(e);
       } else {
-        // Se apagou o número, limpar destaques
         this.clearHighlights();
       }
     }
   }
 
-  // ✨ FUNÇÃO MELHORADA: Seleção automática ao focar
   handleCellFocus(cell) {
     if (cell.disabled) {
       cell.blur();
     } else {
-      // ✨ NOVO: Selecionar todo o conteúdo ao focar (facilita sobreposição)
       setTimeout(() => {
         if (cell.value) {
-          cell.select(); // Seleciona o texto para facilitar sobreposição
+          cell.select();
           this.highlightNumbersByValue(cell.value, cell);
         }
       }, 0);
     }
   }
 
-  // Função para limpar todos os destaques
   clearHighlights() {
     this.gameState.cells.forEach((c) => {
       c.classList.remove("highlight", "selected", "highlight-fixed");
@@ -130,7 +137,6 @@ export class GridManager {
   }
 
   highlightSameNumbers(e) {
-    // Limpar destaques anteriores
     this.clearHighlights();
 
     const clickedCell = e.target;
@@ -155,14 +161,11 @@ export class GridManager {
     });
   }
 
-  // Função para destacar números baseado em valor específico
   highlightNumbersByValue(value, activeCell = null) {
-    // Limpar destaques anteriores
     this.clearHighlights();
 
     if (!value) return;
 
-    // Marcar célula ativa se fornecida
     if (activeCell) {
       activeCell.classList.add("selected");
     }
@@ -213,6 +216,11 @@ export class GridManager {
         cell.classList.toggle("fixed", value !== 0);
         cell.disabled = value !== 0;
         cell.classList.remove("hint");
+
+        // NOVO: Atualizar display baseado no modo
+        if (this.imageMode) {
+          this.imageMode.updateCellDisplay(cell);
+        }
       }
     }
   }
@@ -234,6 +242,11 @@ export class GridManager {
       const col = i % this.gameState.SIZE;
       if (!cell.classList.contains("fixed")) {
         cell.value = board[row][col];
+
+        // NOVO: Atualizar display após atualização
+        if (this.imageMode) {
+          this.imageMode.updateCellDisplay(cell);
+        }
       }
     });
   }
@@ -250,6 +263,10 @@ export class GridManager {
       );
       cell.style.backgroundColor = "";
       cell.style.boxShadow = "";
+      cell.style.backgroundImage = ""; // NOVO
+      cell.style.color = ""; // NOVO
+      cell.style.fontSize = ""; // NOVO
+      cell.removeAttribute("data-value"); // NOVO
       cell.disabled = false;
     });
   }

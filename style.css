@@ -52,17 +52,19 @@
 }
 /*Estilização geral do corpo do jogo*/
 body {
-  font-family: 'Noto Sans JP', sans-serif;
+  font-family: "Noto Sans JP", sans-serif;
   display: flex;
   justify-content: center;
   align-items: center;
   min-height: 100vh;
   padding: 10px;
-  background: linear-gradient(135deg,
+  background: linear-gradient(
+    135deg,
     var(--primary-color) 0%,
     var(--secondary-color) 35%,
     #a64de0 65%,
-    var(--light-purple) 100%);
+    var(--light-purple) 100%
+  );
   background-attachment: fixed;
   color: var(--black);
   line-height: 1.5;
@@ -87,11 +89,11 @@ body {
 }
 /* Título */
 h1 {
-  font-family: 'Press Start 2P', monospace;
+  font-family: "Press Start 2P", monospace;
   /* fonte opcional estilo retrô */
   letter-spacing: 10px;
   font-size: clamp(2.5rem, 4vw, 2rem);
-  background: linear-gradient(90deg,#ff00cc,#3333ff,#00ffff,#ff00cc);
+  background: linear-gradient(90deg, #ff00cc, #3333ff, #00ffff, #ff00cc);
   background-size: 400% 100%;
   -webkit-background-clip: text;
   background-clip: text; /* Compatibilidade */
@@ -209,8 +211,8 @@ h1::after {
 .cell:nth-child(9n) {
   border-right: none;
 }
-.cell:nth-child(n+19):nth-child(-n+27),
-.cell:nth-child(n+46):nth-child(-n+54) {
+.cell:nth-child(n + 19):nth-child(-n + 27),
+.cell:nth-child(n + 46):nth-child(-n + 54) {
   border-bottom: 3px solid var(--dark-purple);
 }
 /* Botões de controle de aúdio e controle do jogo*/
@@ -220,7 +222,7 @@ h1::after {
 #play-button,
 #pause-button,
 #timer {
-  font-family: 'Press Start 2P', monospace;
+  font-family: "Press Start 2P", monospace;
   padding: 14px 20px;
   font-size: clamp(1rem, 4vw, 1.2rem);
   color: var(--white);
@@ -236,7 +238,8 @@ h1::after {
   max-width: 200px;
   display: block;
   background: linear-gradient(
-    135deg, var(--dark-purple),
+    135deg,
+    var(--dark-purple),
     var(--primary-color),
     var(--secondary-color)
   );
@@ -253,7 +256,7 @@ h1::after {
   background-color: var(--secondary-color);
   transform: scale(1.05);
 }
-#pause-button{
+#pause-button {
   display: none; /* Escondido por padrão, será exibido quando o jogo estiver em execução */
 }
 /* Estilização personalizada para cada botão -- para adicionar se preferir
@@ -307,7 +310,11 @@ h1::after {
   animation: slideIn var(--transition-normal);
 }
 .modal-button {
-  background: linear-gradient(135deg, var(--primary-color), var(--primary-color));
+  background: linear-gradient(
+    135deg,
+    var(--primary-color),
+    var(--primary-color)
+  );
   color: var(--cell-bg);
   border: none;
   padding: 12px 30px;
@@ -317,7 +324,7 @@ h1::after {
   font-weight: 700;
   transition: all var(--transition-normal);
 }
-audio{
+audio {
   display: none;
 }
 /* Acessibilidade */
@@ -389,51 +396,62 @@ audio{
 /* ===== MEDIA QUERIES ===== */
 @media (max-width: 480px) {
   body {
-      padding: 5px;
-      background-size: cover, cover;
+    padding: 5px;
+    background-size: cover, cover;
   }
   #sudoku-grid {
-      width: calc(100vw - 20px);
-      max-width: calc(100vh - 100px);
+    width: calc(100vw - 20px);
+    max-width: calc(100vh - 100px);
   }
   .cell {
-      font-size: clamp(0.8rem, 4.5vw, 1.2rem);
+    font-size: clamp(0.8rem, 4.5vw, 1.2rem);
   }
   .cell.selected {
-      box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.7);
+    box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.7);
   }
 
-  .cell.highlight, .cell.highlight-fixed {
-      box-shadow: 0 0 0 1px rgba(0,0,0,0.3);
+  .cell.highlight,
+  .cell.highlight-fixed {
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.3);
   }
   #solve-button {
-      max-width: none;
-      padding: 12px;
+    max-width: none;
+    padding: 12px;
   }
   .modal-content {
-      margin: 5vh auto;
-      padding: 20px;
+    margin: 5vh auto;
+    padding: 20px;
   }
 }
 @media (max-height: 600px) {
   #sudoku-grid {
-      max-width: calc(100vw - 40px);
-      max-height: calc(100vh - 150px);
+    max-width: calc(100vw - 40px);
+    max-height: calc(100vh - 150px);
   }
 
   h1 {
-      margin-bottom: 10px;
-      padding: 10px;
+    margin-bottom: 10px;
+    padding: 10px;
   }
 }
 /* ===== ANIMAÇÕES ===== */
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 @keyframes slideIn {
-  from { transform: translateY(20px); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
 }
 /* Animação para o container de cabeçalho */
 @keyframes fadeInTop {
@@ -475,37 +493,162 @@ audio{
 }
 /* Animação para tela de início */
 @keyframes colorAnimation {
-  0% { background-color: #5b1fa8; }
-  25% { background-color: #8761b8; }
-  50% { background-color: #70e2f7; }
-  75% { background-color: #bd27bd; }
-  100% { background-color: #5b1fa8; }
+  0% {
+    background-color: #5b1fa8;
+  }
+  25% {
+    background-color: #8761b8;
+  }
+  50% {
+    background-color: #70e2f7;
+  }
+  75% {
+    background-color: #bd27bd;
+  }
+  100% {
+    background-color: #5b1fa8;
+  }
 }
 .grid-animation {
   animation: colorAnimation 2s infinite;
 }
 @keyframes colorFlash {
-  0% { background-color: #5b1fa8; }
-  10% { background-color: #6a41a0; }
-  25% { background-color: #8761b8; }
-  40% { background-color: #b0bac4; }
-  50% { background-color: #70e2f7; }
-  60% { background-color: #e068c8; }
-  75% { background-color: #bd27bd; }
-  90% { background-color: #b31593; }
-  100% { background-color: #990b6e; }
+  0% {
+    background-color: #5b1fa8;
+  }
+  10% {
+    background-color: #6a41a0;
+  }
+  25% {
+    background-color: #8761b8;
+  }
+  40% {
+    background-color: #b0bac4;
+  }
+  50% {
+    background-color: #70e2f7;
+  }
+  60% {
+    background-color: #e068c8;
+  }
+  75% {
+    background-color: #bd27bd;
+  }
+  90% {
+    background-color: #b31593;
+  }
+  100% {
+    background-color: #990b6e;
+  }
 
-  0%   { box-shadow: 0 0 5px #fff; transform: scale(1); }
-  10%  { box-shadow: 0 0 10px #ff00cc; transform: scale(1.05); }
-  20%  { box-shadow: 0 0 15px #b60192; transform: scale(1.1); }
-  30%  { box-shadow: 0 0 20px #4e0c41; transform: scale(1.15); }
-  40%  { box-shadow: 0 0 10px #350c2d; transform: scale(1.05); }
-  50%  { box-shadow: 0 0 15px #350c2d; transform: scale(1.1); }
-  60%  { box-shadow: 0 0 20px #4e0c41; transform: scale(1.15); }
-  70%  { box-shadow: 0 0 10px #b60192; transform: scale(1.05); }
-  80%  { box-shadow: 0 0 5px #ff00cc; transform: scale(1); }
-  90%  { box-shadow: 0 0 5px #fff; transform: scale(1); }
-  100% { box-shadow: 0 0 5px #fff; transform: scale(1); }
+  0% {
+    box-shadow: 0 0 5px #fff;
+    transform: scale(1);
+  }
+  10% {
+    box-shadow: 0 0 10px #ff00cc;
+    transform: scale(1.05);
+  }
+  20% {
+    box-shadow: 0 0 15px #b60192;
+    transform: scale(1.1);
+  }
+  30% {
+    box-shadow: 0 0 20px #4e0c41;
+    transform: scale(1.15);
+  }
+  40% {
+    box-shadow: 0 0 10px #350c2d;
+    transform: scale(1.05);
+  }
+  50% {
+    box-shadow: 0 0 15px #350c2d;
+    transform: scale(1.1);
+  }
+  60% {
+    box-shadow: 0 0 20px #4e0c41;
+    transform: scale(1.15);
+  }
+  70% {
+    box-shadow: 0 0 10px #b60192;
+    transform: scale(1.05);
+  }
+  80% {
+    box-shadow: 0 0 5px #ff00cc;
+    transform: scale(1);
+  }
+  90% {
+    box-shadow: 0 0 5px #fff;
+    transform: scale(1);
+  }
+  100% {
+    box-shadow: 0 0 5px #fff;
+    transform: scale(1);
+  }
 }
 
+/* Adicione estas regras ao final do seu arquivo style.css */
 
+/* Estilo para o botão de modo de imagem */
+#image-mode-button {
+  font-family: "Press Start 2P", monospace;
+  padding: 14px 20px;
+  font-size: clamp(1rem, 4vw, 1.2rem);
+  color: var(--white);
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  text-transform: uppercase;
+  box-shadow: var(--shadow-md);
+  background: linear-gradient(
+    135deg,
+    var(--dark-purple),
+    var(--primary-color),
+    var(--secondary-color)
+  );
+  background-size: 400% 400%;
+  transition: all var(--transition-normal);
+}
+
+#image-mode-button:hover {
+  box-shadow: 0 0 12px var(--primary-color);
+  background-color: var(--secondary-color);
+  transform: scale(1.05);
+}
+
+/* Estilos para células no modo de imagem */
+.cell.image-mode {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2px;
+}
+
+.cell.image-mode input {
+  display: none;
+}
+
+/* Ajustes para imagens em células pequenas */
+@media (max-width: 480px) {
+  .cell.image-mode {
+    padding: 1px;
+  }
+}
+
+/* Estilo para células com imagens quando selecionadas */
+.cell.image-mode.selected {
+  background-color: var(--cell-selected-bg);
+  transform: scale(1.02);
+  box-shadow: 0 0 8px var(--light-purple), 0 0 15px var(--light-purple);
+}
+
+/* Estilo para células com imagens quando destacadas */
+.cell.image-mode.highlight {
+  background-color: var(--cell-highlight-bg);
+  box-shadow: 0 0 0 2px var(--primary-color);
+}
+
+.cell.image-mode.highlight-fixed {
+  background-color: var(--primary-color);
+  box-shadow: 0 0 0 2px var(--primary-color);
+}
