@@ -5,10 +5,9 @@ export class GridManager {
     this.gameState = gameState;
     this.validator = new Validator(gameState);
     this.grid = document.getElementById("sudoku-grid");
-    this.imageMode = null; // NOVO
+    this.imageMode = null;
   }
 
-  // NOVA FUNÇÃO
   setImageMode(imageMode) {
     this.imageMode = imageMode;
   }
@@ -55,7 +54,7 @@ export class GridManager {
       e.preventDefault();
       cell.value = e.key;
 
-      // NOVO: Atualizar display se estiver no modo de imagem
+      // Atualizar display se estiver no modo de imagem
       if (this.imageMode) {
         this.imageMode.updateCellDisplay(cell);
       }
@@ -96,12 +95,12 @@ export class GridManager {
       e.target.value = "";
       this.clearHighlights();
 
-      // NOVO: Limpar display de imagem se necessário
+      // Limpar display de imagem se necessário
       if (this.imageMode) {
         this.imageMode.updateCellDisplay(e.target);
       }
     } else {
-      // NOVO: Atualizar display após validação
+      // Atualizar display após validação
       if (this.imageMode) {
         this.imageMode.updateCellDisplay(e.target);
       }
@@ -217,7 +216,7 @@ export class GridManager {
         cell.disabled = value !== 0;
         cell.classList.remove("hint");
 
-        // NOVO: Atualizar display baseado no modo
+        // Atualizar display baseado no modo
         if (this.imageMode) {
           this.imageMode.updateCellDisplay(cell);
         }
@@ -243,7 +242,7 @@ export class GridManager {
       if (!cell.classList.contains("fixed")) {
         cell.value = board[row][col];
 
-        // NOVO: Atualizar display após atualização
+        // Atualizar display após atualização
         if (this.imageMode) {
           this.imageMode.updateCellDisplay(cell);
         }
@@ -263,10 +262,10 @@ export class GridManager {
       );
       cell.style.backgroundColor = "";
       cell.style.boxShadow = "";
-      cell.style.backgroundImage = ""; // NOVO
-      cell.style.color = ""; // NOVO
-      cell.style.fontSize = ""; // NOVO
-      cell.removeAttribute("data-value"); // NOVO
+      cell.style.backgroundImage = "";
+      cell.style.color = "";
+      cell.style.fontSize = "";
+      cell.removeAttribute("data-value");
       cell.disabled = false;
     });
   }

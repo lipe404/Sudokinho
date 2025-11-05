@@ -3,7 +3,7 @@ import { SudokuGenerator } from "./SudokuGenerator.js";
 import { GridManager } from "../ui/GridManager.js";
 import { ModalManager } from "../ui/ModalManager.js";
 import { AudioController } from "../ui/AudioController.js";
-import { ImageMode } from "../ui/ImageMode.js"; // NOVO IMPORT
+import { ImageMode } from "../ui/ImageMode.js";
 import { Timer } from "../utils/Timer.js";
 import { AnimationManager } from "../animations/AnimationManager.js";
 
@@ -14,7 +14,7 @@ export class GameController {
     this.gridManager = new GridManager(this.gameState);
     this.modalManager = new ModalManager();
     this.audioController = new AudioController();
-    this.imageMode = new ImageMode(this.gameState); // NOVA INSTÂNCIA
+    this.imageMode = new ImageMode(this.gameState);
     this.timer = new Timer();
     this.animationManager = new AnimationManager(this.gameState);
 
@@ -35,17 +35,15 @@ export class GameController {
     const solveButton = document.getElementById("solve-button");
     const newGameButton = document.getElementById("new-game-button");
     const hintButton = document.getElementById("hint-button");
-    const imageModeButton = document.getElementById("image-mode-button"); // NOVO
+    const imageModeButton = document.getElementById("image-mode-button");
 
     solveButton.addEventListener("click", () => this.solveSudoku());
     newGameButton.addEventListener("click", () => this.startNewGame());
     hintButton.addEventListener("click", () => this.provideHint());
 
-    // NOVO EVENT LISTENER
     imageModeButton.addEventListener("click", () => this.toggleImageMode());
   }
 
-  // NOVA FUNÇÃO
   toggleImageMode() {
     this.imageMode.toggleMode();
 
@@ -66,7 +64,7 @@ export class GameController {
     this.showDifficultyModal();
   }
 
-  // Salvar estado atual do jogo (ATUALIZADO)
+  // Salvar estado atual do jogo
   saveCurrentGameState() {
     this.previousGameState = {
       currentBoard: this.gameState.currentBoard.map((row) => [...row]),
@@ -75,13 +73,13 @@ export class GameController {
       seconds: this.timer.seconds,
       playerCompleted: this.gameState.playerCompleted,
       lastHintTime: this.gameState.lastHintTime,
-      isImageMode: this.imageMode.getCurrentMode(), // NOVO
+      isImageMode: this.imageMode.getCurrentMode(),
       cellsValues: this.gameState.cells.map((cell) => ({
         value: cell.value,
         disabled: cell.disabled,
         classList: Array.from(cell.classList),
-        dataValue: cell.getAttribute("data-value"), // NOVO
-        backgroundImage: cell.style.backgroundImage, // NOVO
+        dataValue: cell.getAttribute("data-value"),
+        backgroundImage: cell.style.backgroundImage,
       })),
       timerRunning: this.timer.timerInterval !== null,
       gameButtonsVisible: {
@@ -91,7 +89,7 @@ export class GameController {
     };
   }
 
-  // Restaurar estado anterior (ATUALIZADO)
+  // Restaurar estado anterior
   restorePreviousGameState() {
     if (!this.previousGameState) return;
 
@@ -111,7 +109,7 @@ export class GameController {
     // NOVO: Restaurar modo de imagem
     this.imageMode.setMode(this.previousGameState.isImageMode);
 
-    // Restaurar células (ATUALIZADO)
+    // Restaurar células
     this.gameState.cells.forEach((cell, index) => {
       const savedCell = this.previousGameState.cellsValues[index];
       cell.value = savedCell.value;
@@ -256,7 +254,7 @@ export class GameController {
     this.showGameButtons();
     this.gameState.animacaoAtiva = false;
 
-    // NOVO: Atualizar display baseado no modo atual
+    // Atualizar display baseado no modo atual
     this.imageMode.updateAllCells();
   }
 
@@ -276,7 +274,7 @@ export class GameController {
     if (this.sudokuGenerator.solveSudoku(boardToSolve)) {
       this.gridManager.updateCellsFromBoard(boardToSolve);
 
-      // NOVO: Atualizar display após resolver
+      // Atualizar display após resolver
       this.imageMode.updateAllCells();
 
       this.timer.clear();
@@ -327,7 +325,7 @@ export class GameController {
 
     cell.value = this.gameState.solutionBoard[row][col];
 
-    // NOVO: Atualizar display da célula com dica
+    // Atualizar display da célula com dica
     this.imageMode.updateCellDisplay(cell);
 
     this.animationManager.animateHint(cell);

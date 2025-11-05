@@ -7,7 +7,7 @@ export class Timer {
 
   start() {
     this.clear();
-    this.seconds = 0; // ✅ SEMPRE resetar para novo jogo
+    this.seconds = 0;
     this.updateDisplay();
 
     this.timerInterval = setInterval(() => {
@@ -16,9 +16,9 @@ export class Timer {
     }, 1000);
   }
 
-  // ✨ NOVA FUNÇÃO: Continuar timer do ponto atual
+  // Continuar timer do ponto atual
   resume() {
-    if (this.timerInterval) return; // Já está rodando
+    if (this.timerInterval) return;
 
     this.timerInterval = setInterval(() => {
       this.seconds++;
@@ -26,7 +26,7 @@ export class Timer {
     }, 1000);
   }
 
-  // ✨ NOVA FUNÇÃO: Restaurar timer com tempo específico
+  // Restaurar timer com tempo específico
   restoreAndStart(savedSeconds) {
     this.clear();
     this.seconds = savedSeconds;
@@ -41,7 +41,7 @@ export class Timer {
     }
   }
 
-  // ✨ NOVA FUNÇÃO: Pausar sem limpar o tempo
+  // Pausar sem limpar o tempo
   pause() {
     if (this.timerInterval) {
       clearInterval(this.timerInterval);
@@ -49,7 +49,7 @@ export class Timer {
     }
   }
 
-  // ✨ NOVA FUNÇÃO: Reset completo
+  // Reset completo
   reset() {
     this.clear();
     this.seconds = 0;

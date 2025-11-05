@@ -1,15 +1,3 @@
-/* Estilização geral do jogo Sudoku
-  Autor: Felipe Toledo
-  Versão: 2.1
-  Data: 08-06-2025
-  Descrição: Este código contém a estilização do jogo Sudoku, incluindo cores, fontes, animações e responsividade.
-  O design é inspirado em temas de jogos retrô e utiliza uma paleta de cores vibrantes para criar uma experiência visual envolvente.
-  O código é organizado em seções para facilitar a leitura e manutenção, com comentários explicativos para cada parte.
-  O jogo é responsivo e se adapta a diferentes tamanhos de tela, garantindo uma boa experiência em dispositivos móveis e desktops.
-  O código inclui animações para interações do usuário, como hover e foco, além de transições suaves para elementos dinâmicos.
-  O jogo também possui um sistema de feedback visual para ações como seleção de células, dicas e erros, melhorando a usabilidade e acessibilidade.
-*/
-
 /* ===== VARIÁVEIS CSS ===== */
 :root {
   /* Cores principais do jogo */
@@ -257,25 +245,8 @@ h1::after {
   transform: scale(1.05);
 }
 #pause-button {
-  display: none; /* Escondido por padrão, será exibido quando o jogo estiver em execução */
+  display: none;
 }
-/* Estilização personalizada para cada botão -- para adicionar se preferir
-#play-button {
-  background: linear-gradient(135deg, #00ffff, #ff00cc);
-}
-#pause-button {
-  background: linear-gradient(135deg, #ff8800, #ff00cc);
-}
-#new-game-button {
-  background: linear-gradient(135deg, #00ff99, #3333ff);
-}
-#hint-button {
-  background: linear-gradient(135deg, #ffff00, #ff00cc);
-}
-#solve-button {
-  background: linear-gradient(135deg, #ff5555, #00ffff);
-}
-*/
 /* Modals */
 .custom-modal {
   display: none;
@@ -586,8 +557,6 @@ audio {
     transform: scale(1);
   }
 }
-
-/* Adicione estas regras ao final do seu arquivo style.css */
 
 /* Estilo para o botão de modo de imagem */
 #image-mode-button {
