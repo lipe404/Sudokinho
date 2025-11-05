@@ -207,6 +207,8 @@ h1::after {
 #new-game-button,
 #solve-button,
 #hint-button,
+#undo-button,
+#redo-button,
 #play-button,
 #pause-button,
 #timer {
@@ -237,12 +239,20 @@ h1::after {
 #new-game-button:hover,
 #solve-button:hover,
 #hint-button:hover,
+#undo-button:hover:not(:disabled),
+#redo-button:hover:not(:disabled),
 #play-button:hover,
 #pause-button:hover,
 #timer:hover {
   box-shadow: 0 0 12px var(--primary-color);
   background-color: var(--secondary-color);
   transform: scale(1.05);
+}
+#undo-button:disabled,
+#redo-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
 }
 #pause-button {
   display: none;

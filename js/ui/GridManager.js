@@ -6,10 +6,15 @@ export class GridManager {
     this.validator = new Validator(gameState);
     this.grid = document.getElementById("sudoku-grid");
     this.imageMode = null;
+    this.historyManager = null;
   }
 
   setImageMode(imageMode) {
     this.imageMode = imageMode;
+  }
+
+  setHistoryManager(historyManager) {
+    this.historyManager = historyManager;
   }
 
   createGrid() {
@@ -50,9 +55,24 @@ export class GridManager {
       return;
     }
 
+    // Salvar estado antes de apagar com Backspace ou Delete
+    if ((e.key === "Backspace" || e.key === "Delete") && cell.value && this.historyManager) {
+      const currentBoard = this.getCurrentBoardState();
+      const index = parseInt(cell.dataset.index);
+      this.historyManager.saveState(currentBoard, index);
+    }
+
     if (/^[1-9]$/.test(e.key)) {
+      // Salvar estado antes de inserir novo valor
+      if (this.historyManager && cell.value) {
+        const currentBoard = this.getCurrentBoardState();
+        const index = parseInt(cell.dataset.index);
+        this.historyManager.saveState(currentBoard, index);
+      }
+
       e.preventDefault();
       cell.value = e.key;
+      cell.setAttribute("data-old-value", e.key);
 
       // Atualizar display se estiver no modo de imagem
       if (this.imageMode) {
@@ -85,32 +105,47 @@ export class GridManager {
   }
 
   validateCellInput(e) {
-    const value = e.target.value;
+    try {
+      const cell = e.target;
+      const newValue = cell.value;
+      const oldValue = cell.getAttribute("data-old-value") || "";
 
-    if (value.length > 1) {
-      e.target.value = value.slice(-1);
-    }
-
-    if (e.target.value && !/^[1-9]$/.test(e.target.value)) {
-      e.target.value = "";
-      this.clearHighlights();
-
-      // Limpar display de imagem se necessário
-      if (this.imageMode) {
-        this.imageMode.updateCellDisplay(e.target);
-      }
-    } else {
-      // Atualizar display após validação
-      if (this.imageMode) {
-        this.imageMode.updateCellDisplay(e.target);
+      // Salvar estado ANTES de fazer qualquer mudança (apenas se o valor realmente mudou)
+      if (this.historyManager && newValue !== oldValue && !cell.disabled) {
+        const currentBoard = this.getCurrentBoardState();
+        const index = parseInt(cell.dataset.index);
+        this.historyManager.saveState(currentBoard, index);
+        cell.setAttribute("data-old-value", newValue);
       }
 
-      this.validator.checkIfPlayerCompletedBoard();
-      if (e.target.value) {
-        this.highlightSameNumbers(e);
-      } else {
+      if (newValue.length > 1) {
+        cell.value = newValue.slice(-1);
+      }
+
+      if (cell.value && !/^[1-9]$/.test(cell.value)) {
+        cell.value = "";
+        cell.setAttribute("data-old-value", "");
         this.clearHighlights();
+
+        // Limpar display de imagem se necessário
+        if (this.imageMode) {
+          this.imageMode.updateCellDisplay(cell);
+        }
+      } else {
+        // Atualizar display após validação
+        if (this.imageMode) {
+          this.imageMode.updateCellDisplay(cell);
+        }
+
+        this.validator.checkIfPlayerCompletedBoard();
+        if (cell.value) {
+          this.highlightSameNumbers(e);
+        } else {
+          this.clearHighlights();
+        }
       }
+    } catch (error) {
+      console.error('Erro ao validar input da célula:', error);
     }
   }
 
@@ -215,6 +250,8 @@ export class GridManager {
         cell.classList.toggle("fixed", value !== 0);
         cell.disabled = value !== 0;
         cell.classList.remove("hint");
+        // Inicializar data-old-value para rastreamento de mudanças
+        cell.setAttribute("data-old-value", value || "");
 
         // Atualizar display baseado no modo
         if (this.imageMode) {
@@ -236,18 +273,27 @@ export class GridManager {
   }
 
   updateCellsFromBoard(board) {
-    this.gameState.cells.forEach((cell, i) => {
-      const row = Math.floor(i / this.gameState.SIZE);
-      const col = i % this.gameState.SIZE;
-      if (!cell.classList.contains("fixed")) {
-        cell.value = board[row][col];
+    try {
+      this.gameState.cells.forEach((cell, i) => {
+        const row = Math.floor(i / this.gameState.SIZE);
+        const col = i % this.gameState.SIZE;
+        if (!cell.classList.contains("fixed")) {
+          // Converter 0 para string vazia para não mostrar "0" nas células
+          const value = board[row][col];
+          const displayValue = value === 0 || value === "0" ? "" : value.toString();
+          cell.value = displayValue;
+          // Atualizar data-old-value para rastreamento
+          cell.setAttribute("data-old-value", displayValue);
 
-        // Atualizar display após atualização
-        if (this.imageMode) {
-          this.imageMode.updateCellDisplay(cell);
+          // Atualizar display após atualização
+          if (this.imageMode) {
+            this.imageMode.updateCellDisplay(cell);
+          }
         }
-      }
-    });
+      });
+    } catch (error) {
+      console.error('Erro ao atualizar células do tabuleiro:', error);
+    }
   }
 
   clearAllCells() {

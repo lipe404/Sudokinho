@@ -11,9 +11,14 @@
     <meta name="keywords" content="Sudoku, jogo, puzzle, diversão" />
     <meta name="author" content="Felipe Toledo" />
     <meta name="theme-color" content="#8436c7" />
+    <!--PWA-->
+    <link rel="manifest" href="manifest.json" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Sudokinho" />
     <!--Título e ícone-->
     <title>Sudokinho</title>
-    <link rel="icon" href="icon.ico" type="image/x-icon" />
+    <link rel="icon" href="imgs/icon.ico" type="image/x-icon" />
     <!--Estilos e fontes-->
     <link rel="stylesheet" href="style.css" />
     <link
@@ -67,6 +72,22 @@
           class="secondary-button"
         >
           Dica
+        </button>
+        <button
+          id="undo-button"
+          aria-label="Desfazer"
+          class="secondary-button"
+          disabled
+        >
+          ↶ Undo
+        </button>
+        <button
+          id="redo-button"
+          aria-label="Refazer"
+          class="secondary-button"
+          disabled
+        >
+          ↷ Redo
         </button>
       </footer>
     </main>
