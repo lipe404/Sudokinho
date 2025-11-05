@@ -8,6 +8,7 @@ export class GridManager {
     this.imageMode = null;
     this.historyManager = null;
     this.onHistoryChange = null; // Callback quando histórico muda
+    this.onGameCompleted = null; // Callback quando jogo é completado
   }
 
   setImageMode(imageMode) {
@@ -20,6 +21,10 @@ export class GridManager {
 
   setHistoryChangeCallback(callback) {
     this.onHistoryChange = callback;
+  }
+
+  setGameCompletedCallback(callback) {
+    this.onGameCompleted = callback;
   }
 
   createGrid() {
@@ -143,7 +148,14 @@ export class GridManager {
           this.imageMode.updateCellDisplay(cell);
         }
 
-        this.validator.checkIfPlayerCompletedBoard();
+        const completionData = this.validator.checkIfPlayerCompletedBoard();
+        if (completionData && completionData.completed) {
+          // Notificar GameController sobre conclusão
+          if (this.onGameCompleted) {
+            this.onGameCompleted(completionData);
+          }
+        }
+        
         if (cell.value) {
           this.highlightSameNumbers(e);
         } else {

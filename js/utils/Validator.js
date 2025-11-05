@@ -12,16 +12,31 @@ export class Validator {
       const timer = document.getElementById("timer");
       const finalTime = timer.textContent;
 
-      this.modalManager.showCustomAlert(
-        "Parabéns!",
-        `Você completou o Sudoku corretamente em ${finalTime}!`,
-        "success"
-      );
+      // Contar erros no tabuleiro
+      let errorCount = 0;
+      for (let row = 0; row < this.gameState.SIZE; row++) {
+        for (let col = 0; col < this.gameState.SIZE; col++) {
+          const value = board[row][col];
+          if (value !== 0) {
+            board[row][col] = 0;
+            if (!this.isValidPlacement(value, row, col, board)) {
+              errorCount++;
+            }
+            board[row][col] = value;
+          }
+        }
+      }
 
-      document.getElementById("solve-button").style.display = "none";
-      document.getElementById("hint-button").style.display = "none";
-      this.gameState.playerCompleted = true;
+      // Retornar dados do jogo completado para processamento de conquistas
+      return {
+        completed: true,
+        time: finalTime,
+        timeSeconds: this.gameState.timer.seconds,
+        errors: errorCount,
+        hintsUsed: this.gameState.hintsUsed || 0
+      };
     }
+    return { completed: false };
   }
 
   isBoardComplete(board) {

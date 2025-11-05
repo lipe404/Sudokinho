@@ -12,6 +12,7 @@ import { Timer } from "../utils/Timer.js";
 import { AnimationManager } from "../animations/AnimationManager.js";
 import { HistoryManager } from "../utils/HistoryManager.js";
 import { SaveManager } from "../utils/SaveManager.js";
+import { AchievementsSystem } from "../utils/AchievementsSystem.js";
 
 export class GameController {
   constructor() {
@@ -29,6 +30,7 @@ export class GameController {
       this.animationManager = new AnimationManager(this.gameState);
       this.historyManager = new HistoryManager();
       this.saveManager = new SaveManager();
+      this.achievementsSystem = new AchievementsSystem();
       
       // Estado temporário para cancelamento
       this.previousGameState = null;
@@ -64,6 +66,7 @@ export class GameController {
       this.gridManager.setImageMode(this.imageMode);
       this.gridManager.setHistoryManager(this.historyManager);
       this.gridManager.setHistoryChangeCallback(() => this.updateUndoRedoButtons());
+      this.gridManager.setGameCompletedCallback((data) => this.handleGameCompleted(data));
       this.audioController.setup();
       this.hideGameButtons();
       this.animationManager.startGridAnimation();
@@ -87,6 +90,7 @@ export class GameController {
       const imageModeButton = document.getElementById("image-mode-button");
       const undoButton = document.getElementById("undo-button");
       const redoButton = document.getElementById("redo-button");
+      const achievementsButton = document.getElementById("achievements-button");
 
       if (!solveButton || !newGameButton || !hintButton || !imageModeButton) {
         throw new Error("Botões não encontrados no DOM");
@@ -103,6 +107,19 @@ export class GameController {
       }
       if (redoButton) {
         redoButton.addEventListener("click", () => this.redo());
+      }
+
+      // Botão de conquistas
+      if (achievementsButton) {
+        achievementsButton.addEventListener("click", () => this.showAchievementsList());
+      }
+
+      // Fechar modal de conquistas
+      const closeAchievementsButton = document.getElementById("closeAchievementsButton");
+      if (closeAchievementsButton) {
+        closeAchievementsButton.addEventListener("click", () => {
+          this.modalManager.hideModal("achievementsModal");
+        });
       }
 
       // Atalhos de teclado
@@ -837,6 +854,171 @@ export class GameController {
       if (hintButton) hintButton.style.display = "none";
     } catch (error) {
       console.error('Erro ao esconder botões:', error);
+    }
+  }
+
+  /**
+   * Lida com a conclusão do jogo
+   * @param {Object} completionData - Dados da conclusão
+   */
+  handleGameCompleted(completionData) {
+    try {
+      // Evitar processamento duplicado
+      if (this.gameState.playerCompleted) {
+        return;
+      }
+
+      this.gameState.playerCompleted = true;
+      this.timer.clear();
+
+      // Esconder botões
+      this.hideGameButtons();
+      document.getElementById("solve-button").style.display = "none";
+      document.getElementById("hint-button").style.display = "none";
+
+      // Verificar se é primeira vitória
+      const stats = this.saveManager.loadStats();
+      const isFirstWin = stats.gamesCompleted === 0;
+
+      // Preparar dados para verificação de conquistas
+      const gameData = {
+        time: completionData.timeSeconds,
+        errors: completionData.errors || 0,
+        hintsUsed: completionData.hintsUsed || 0,
+        isFirstWin: isFirstWin
+      };
+
+      // Verificar conquistas
+      const newlyUnlocked = this.achievementsSystem.checkAchievements(gameData);
+
+      // Atualizar estatísticas
+      stats.gamesCompleted = (stats.gamesCompleted || 0) + 1;
+      stats.gamesPlayed = (stats.gamesPlayed || 0) + 1;
+      this.saveManager.saveStats(stats);
+
+      // Limpar save
+      this.saveManager.clearSave();
+
+      // Mostrar mensagem de vitória com conquistas
+      this.showVictoryModal(completionData.time, newlyUnlocked);
+    } catch (error) {
+      console.error('Erro ao processar conclusão do jogo:', error);
+      // Fallback: mostrar mensagem básica
+      this.modalManager.showCustomAlert(
+        "Parabéns!",
+        `Você completou o Sudoku corretamente em ${completionData.time}!`,
+        "success"
+      );
+    }
+  }
+
+  /**
+   * Mostra modal de vitória com conquistas
+   * @param {string} time - Tempo formatado
+   * @param {Array<Object>} achievements - Conquistas desbloqueadas
+   */
+  showVictoryModal(time, achievements) {
+    try {
+      let message = `Você completou o Sudoku corretamente em ${time}!`;
+      
+      if (achievements.length > 0) {
+        message += "\n\n🎉 Conquistas Desbloqueadas:\n\n";
+        achievements.forEach(achievement => {
+          message += `${achievement.icon} ${achievement.name}\n${achievement.description}\n\n`;
+        });
+      }
+
+      this.modalManager.showCustomAlert(
+        "Parabéns!",
+        message,
+        "success"
+      );
+
+      // Se houver conquistas, mostrar modal especial também
+      if (achievements.length > 0) {
+        setTimeout(() => {
+          this.showAchievementsModal(achievements);
+        }, 2000);
+      }
+    } catch (error) {
+      console.error('Erro ao mostrar modal de vitória:', error);
+      this.modalManager.showCustomAlert(
+        "Parabéns!",
+        `Você completou o Sudoku corretamente em ${time}!`,
+        "success"
+      );
+    }
+  }
+
+  /**
+   * Mostra modal de conquistas desbloqueadas
+   * @param {Array<Object>} achievements - Conquistas desbloqueadas
+   */
+  showAchievementsModal(achievements) {
+    try {
+      // Criar HTML das conquistas
+      let achievementsHTML = '<div class="achievements-unlocked">';
+      achievements.forEach(achievement => {
+        achievementsHTML += `
+          <div class="achievement-item unlocked">
+            <span class="achievement-icon">${achievement.icon}</span>
+            <div class="achievement-info">
+              <h4 class="achievement-name">${achievement.name}</h4>
+              <p class="achievement-description">${achievement.description}</p>
+            </div>
+          </div>
+        `;
+      });
+      achievementsHTML += '</div>';
+
+      this.modalManager.showCustomAlert(
+        "🎉 Novas Conquistas!",
+        achievementsHTML,
+        "success"
+      );
+    } catch (error) {
+      console.error('Erro ao mostrar modal de conquistas:', error);
+    }
+  }
+
+  /**
+   * Mostra lista completa de conquistas
+   */
+  showAchievementsList() {
+    try {
+      const achievementsList = document.getElementById("achievements-list");
+      if (!achievementsList) return;
+
+      const allAchievements = this.achievementsSystem.getAllAchievementsWithStatus();
+      const stats = this.achievementsSystem.getStats();
+
+      let html = `
+        <div class="achievements-stats">
+          <p>Progresso: ${stats.unlocked}/${stats.total} (${stats.progress}%)</p>
+        </div>
+        <div class="achievements-grid">
+      `;
+
+      allAchievements.forEach(achievement => {
+        const unlockedClass = achievement.unlocked ? 'unlocked' : 'locked';
+        html += `
+          <div class="achievement-item ${unlockedClass}">
+            <span class="achievement-icon">${achievement.icon}</span>
+            <div class="achievement-info">
+              <h4 class="achievement-name">${achievement.name}</h4>
+              <p class="achievement-description">${achievement.description}</p>
+              ${achievement.unlocked ? '<span class="achievement-badge">Desbloqueada</span>' : '<span class="achievement-badge locked">Bloqueada</span>'}
+            </div>
+          </div>
+        `;
+      });
+
+      html += '</div>';
+      achievementsList.innerHTML = html;
+
+      this.modalManager.showModal("achievementsModal");
+    } catch (error) {
+      console.error('Erro ao mostrar lista de conquistas:', error);
     }
   }
 

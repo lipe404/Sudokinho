@@ -53,6 +53,13 @@
           >
             🐹
           </button>
+          <!-- Botão de conquistas -->
+          <button
+            id="achievements-button"
+            aria-label="Ver conquistas"
+          >
+            🏆
+          </button>
         </div>
         <!--Temporizador-->
         <div id="timer" aria-label="Tempo" role="timer">00:00</div>
@@ -146,6 +153,21 @@
           <button class="modal-button" id="continueGameButton">Continuar</button>
           <button class="modal-button secondary" id="newGameFromSaveButton">Novo Jogo</button>
         </div>
+      </div>
+    </div>
+
+    <!-- Modal de conquistas -->
+    <div
+      id="achievementsModal"
+      class="custom-modal"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="achievementsModalTitle"
+    >
+      <div class="modal-content achievements-modal-content">
+        <h3 class="modal-title" id="achievementsModalTitle">Conquistas</h3>
+        <div id="achievements-list" class="achievements-list"></div>
+        <button class="modal-button" id="closeAchievementsButton">Fechar</button>
       </div>
     </div>
 

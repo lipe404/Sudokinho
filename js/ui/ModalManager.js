@@ -22,12 +22,21 @@ export class ModalManager {
     }
 
     this.modalTitle.textContent = title;
-    this.modalMessage.textContent = message;
+    
+    // Se message contém HTML, usar innerHTML, senão textContent
+    if (message.includes('<') && message.includes('>')) {
+      this.modalMessage.innerHTML = message;
+    } else {
+      this.modalMessage.textContent = message;
+    }
+    
     const content = this.modal.querySelector(".modal-content");
 
     content.style.background =
       type === "success"
         ? "linear-gradient(135deg,rgb(155, 55, 231) 0%,rgb(155, 55, 231) 100%)"
+        : type === "info"
+        ? "linear-gradient(135deg, #2196f3 0%, #2196f3 100%)"
         : "linear-gradient(135deg, #ff5555 0%, #ff5555 100%)";
 
     this.modal.style.display = "block";
