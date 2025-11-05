@@ -304,6 +304,35 @@ h1::after {
   cursor: pointer;
   font-weight: 700;
   transition: all var(--transition-normal);
+  margin: 0.5rem;
+}
+
+.modal-button.secondary {
+  background: linear-gradient(
+    135deg,
+    var(--secondary-color),
+    var(--secondary-color)
+  );
+  color: var(--white);
+}
+
+.modal-button:hover {
+  transform: scale(1.05);
+  box-shadow: var(--shadow-md);
+}
+
+.modal-buttons-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 1.5rem;
+}
+
+@media (min-width: 480px) {
+  .modal-buttons-container {
+    flex-direction: row;
+    justify-content: center;
+  }
 }
 audio {
   display: none;

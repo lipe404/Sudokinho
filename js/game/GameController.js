@@ -63,6 +63,7 @@ export class GameController {
       this.gridManager.createGrid();
       this.gridManager.setImageMode(this.imageMode);
       this.gridManager.setHistoryManager(this.historyManager);
+      this.gridManager.setHistoryChangeCallback(() => this.updateUndoRedoButtons());
       this.audioController.setup();
       this.hideGameButtons();
       this.animationManager.startGridAnimation();
@@ -471,6 +472,7 @@ export class GameController {
       // Salvar estado inicial no histórico
       const initialBoard = this.gridManager.getCurrentBoardState();
       this.historyManager.saveState(initialBoard);
+      this.updateUndoRedoButtons();
 
       // Atualizar display baseado no modo atual
       this.imageMode.updateAllCells();
@@ -685,19 +687,51 @@ export class GameController {
         setTimeout(() => {
           const saved = this.saveManager.loadGame();
           if (saved) {
-            this.modalManager.showCustomAlert(
-              'Jogo Salvo Encontrado',
-              'Você tem um jogo em progresso. Deseja continuar?',
-              'info'
-            );
-            // Adicionar botões para continuar ou novo jogo
-            // Por enquanto, apenas carrega automaticamente
-            // this.loadSavedGame();
+            this.showSavedGameModal();
           }
         }, 1000);
       }
     } catch (error) {
       console.error('Erro ao verificar jogo salvo:', error);
+    }
+  }
+
+  /**
+   * Mostra modal de jogo salvo com opções
+   */
+  showSavedGameModal() {
+    try {
+      const modal = document.getElementById("savedGameModal");
+      const continueButton = document.getElementById("continueGameButton");
+      const newGameButton = document.getElementById("newGameFromSaveButton");
+
+      if (!modal || !continueButton || !newGameButton) {
+        console.error('Elementos do modal de jogo salvo não encontrados');
+        return;
+      }
+
+      // Remover event listeners anteriores se existirem
+      const newContinueBtn = continueButton.cloneNode(true);
+      const newNewGameBtn = newGameButton.cloneNode(true);
+      continueButton.parentNode.replaceChild(newContinueBtn, continueButton);
+      newGameButton.parentNode.replaceChild(newNewGameBtn, newGameButton);
+
+      // Adicionar novos event listeners
+      newContinueBtn.addEventListener("click", () => {
+        this.modalManager.hideModal("savedGameModal");
+        this.loadSavedGame();
+      });
+
+      newNewGameBtn.addEventListener("click", () => {
+        this.modalManager.hideModal("savedGameModal");
+        this.saveManager.clearSave();
+        // Não fazer nada, deixa o usuário iniciar um novo jogo manualmente
+      });
+
+      // Mostrar modal
+      this.modalManager.showModal("savedGameModal");
+    } catch (error) {
+      console.error('Erro ao mostrar modal de jogo salvo:', error);
     }
   }
 
@@ -708,14 +742,48 @@ export class GameController {
     try {
       const saved = this.saveManager.loadGame();
       if (saved) {
-        this.gameState.currentBoard = saved.board;
-        this.gameState.solutionBoard = saved.solution;
-        this.gameState.currentDifficulty = saved.difficulty;
-        this.timer.restoreAndStart(saved.time);
-        this.imageMode.setMode(saved.imageMode);
+        // Parar animação se estiver ativa
+        const grid = document.getElementById("sudoku-grid");
+        if (grid) {
+          grid.classList.remove("grid-animation");
+        }
+        this.gameState.animacaoAtiva = false;
+        this.animationManager.stopGridAnimation();
+
+        // Restaurar estado do jogo
+        this.gameState.currentBoard = saved.board.map(row => [...row]);
+        this.gameState.solutionBoard = saved.solution.map(row => [...row]);
+        this.gameState.currentDifficulty = saved.difficulty || this.gameState.DIFFICULTY_LEVELS.medium;
+        
+        // Restaurar timer
+        this.timer.restoreAndStart(saved.time || 0);
+        
+        // Restaurar modo de imagem
+        this.imageMode.setMode(saved.imageMode || false);
+        
+        // Preencher células
         this.gridManager.fillCells(saved.board);
+        
+        // Habilitar células editáveis
+        this.gridManager.enableCells();
+        
+        // Mostrar botões
         this.showGameButtons();
+        
+        // Atualizar display
         this.imageMode.updateAllCells();
+        
+        // Limpar e salvar estado inicial no histórico
+        this.historyManager.clear();
+        const initialBoard = this.gridManager.getCurrentBoardState();
+        this.historyManager.saveState(initialBoard);
+        this.updateUndoRedoButtons();
+
+        // Reabilitar botão de novo jogo
+        const newGameButton = document.getElementById("new-game-button");
+        if (newGameButton) {
+          newGameButton.disabled = false;
+        }
       }
     } catch (error) {
       console.error('Erro ao carregar jogo salvo:', error);

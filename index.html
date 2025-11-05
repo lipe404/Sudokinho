@@ -13,6 +13,7 @@
     <meta name="theme-color" content="#8436c7" />
     <!--PWA-->
     <link rel="manifest" href="manifest.json" />
+    <link rel="apple-touch-icon" href="imgs/icon.jpg" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="Sudokinho" />
@@ -124,6 +125,26 @@
           <button class="difficulty-btn" data-difficulty="easy">Fácil</button>
           <button class="difficulty-btn" data-difficulty="medium">Médio</button>
           <button class="difficulty-btn" data-difficulty="hard">Difícil</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal de jogo salvo -->
+    <div
+      id="savedGameModal"
+      class="custom-modal"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="savedGameModalTitle"
+    >
+      <div class="modal-content">
+        <h3 class="modal-title" id="savedGameModalTitle">Jogo Salvo Encontrado</h3>
+        <p class="modal-message" id="savedGameModalMessage">
+          Você tem um jogo em progresso. Deseja continuar?
+        </p>
+        <div class="modal-buttons-container">
+          <button class="modal-button" id="continueGameButton">Continuar</button>
+          <button class="modal-button secondary" id="newGameFromSaveButton">Novo Jogo</button>
         </div>
       </div>
     </div>

@@ -7,6 +7,7 @@ export class GridManager {
     this.grid = document.getElementById("sudoku-grid");
     this.imageMode = null;
     this.historyManager = null;
+    this.onHistoryChange = null; // Callback quando histórico muda
   }
 
   setImageMode(imageMode) {
@@ -15,6 +16,10 @@ export class GridManager {
 
   setHistoryManager(historyManager) {
     this.historyManager = historyManager;
+  }
+
+  setHistoryChangeCallback(callback) {
+    this.onHistoryChange = callback;
   }
 
   createGrid() {
@@ -31,6 +36,7 @@ export class GridManager {
       cell.addEventListener("keydown", (e) => this.handleKeyDown(e));
       cell.addEventListener("click", (e) => this.highlightSameNumbers(e));
       cell.addEventListener("focus", () => this.handleCellFocus(cell));
+      cell.addEventListener("blur", (e) => this.handleCellBlur(e, cell));
       cell.addEventListener("mousedown", (e) =>
         this.handleCellMouseDown(e, cell)
       );
@@ -159,6 +165,37 @@ export class GridManager {
           this.highlightNumbersByValue(cell.value, cell);
         }
       }, 0);
+    }
+  }
+
+  /**
+   * Lida com o evento blur (quando o usuário sai da célula)
+   * @param {Event} e - Evento de blur
+   * @param {HTMLElement} cell - Célula
+   */
+  handleCellBlur(e, cell) {
+    try {
+      if (cell.disabled || cell.classList.contains("fixed")) {
+        return;
+      }
+
+      // Salvar histórico quando o usuário sai da célula (apenas se houve mudança)
+      const currentValue = cell.value || "";
+      const oldValue = cell.getAttribute("data-old-value") || "";
+      
+      if (currentValue !== oldValue && this.historyManager) {
+        const currentBoard = this.getCurrentBoardState();
+        const index = parseInt(cell.dataset.index);
+        this.historyManager.saveState(currentBoard, index);
+        cell.setAttribute("data-old-value", currentValue);
+        
+        // Notificar que o histórico mudou (para atualizar botões undo/redo)
+        if (this.onHistoryChange) {
+          this.onHistoryChange();
+        }
+      }
+    } catch (error) {
+      console.error('Erro ao processar blur da célula:', error);
     }
   }
 
