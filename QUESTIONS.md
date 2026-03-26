@@ -15,26 +15,6 @@ Este arquivo reúne perguntas e pontos de atenção técnicos para orientar deci
 - Há metas de acessibilidade (WCAG AA), tamanho de bundle e tempo de carregamento a cumprir?
   Resposta: As mais acessiveis e perfomaticas possíveis
 
-## Persistência e Estado
-
-- O auto‑save a cada 30s em [GameController.setupAutoSave](file:///c:/Users/toled/Documents/GitHub/Sudokinho/js/game/GameController.js#L666-L674) é agressivo o suficiente ou devemos debounçar por interação e salvar ao pausar/perder foco?
-  Resposta: Debounçar
-- A captura do snapshot completo do DOM/células em [GameController.saveCurrentGameState](file:///c:/Users/toled/Documents/GitHub/Sudokinho/js/game/GameController.js#L225-L248) é necessária ou conseguimos serializar apenas o estado lógico + preferências?
-  Resposta: Vamos serializar
-- Em [SaveManager.saveGame](file:///c:/Users/toled/Documents/GitHub/Sudokinho/js/utils/SaveManager.js#L17-L46), há um bug: o `saveData` é referenciado fora do escopo no bloco de `catch`. Confirmamos correção movendo a declaração para escopo externo e tratando múltiplos nomes de erro de quota?
-  Resposta: É um bug, audite refine e corrija
-- Devemos versionar o schema de save (ex.: `version: 1`) e implementar migrações para futuras mudanças?
-  Resposta: Sim
-
-## Histórico (Undo/Redo)
-
-- O histórico máximo de 50 estados em [HistoryManager](file:///c:/Users/toled/Documents/GitHub/Sudokinho/js/utils/HistoryManager.js#L5-L10) é adequado? Queremos torná-lo configurável por dispositivo/performance?
-  Resposta: Sim, torna configuravel
-- Devemos compactar diffs (célula/valor) em vez de guardar o tabuleiro completo por estado para reduzir memória?
-  Resposta: Sim
-- Existem pontos de gravação redundantes (keydown, input, blur) em [GridManager](file:///c:/Users/toled/Documents/GitHub/Sudokinho/js/ui/GridManager.js#L69-L83, file:///c:/Users/toled/Documents/GitHub/Sudokinho/js/ui/GridManager.js#L118-L131, file:///c:/Users/toled/Documents/GitHub/Sudokinho/js/ui/GridManager.js#L188-L212) que poderiam ser consolidados para evitar excesso de snapshots?
-  Resposta: Vamos consolidar
-
 ## Modo Imagem
 
 - O [ImageMode](file:///c:/Users/toled/Documents/GitHub/Sudokinho/js/ui/ImageMode.js#L15-L28) pré-carrega apenas `.png`, mas existem `jpg/avif` em `imgs/assets/`. Devemos padronizar formato (preferir `avif` com fallback) e reduzir peso?

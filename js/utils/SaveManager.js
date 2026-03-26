@@ -7,6 +7,7 @@ export class SaveManager {
     this.SAVE_KEY = 'sudokinho_save';
     this.STATS_KEY = 'sudokinho_stats';
     this.SETTINGS_KEY = 'sudokinho_settings';
+    this.CURRENT_VERSION = 1;
   }
 
   /**
@@ -22,7 +23,7 @@ export class SaveManager {
       time: gameData.time,
       imageMode: gameData.imageMode,
       timestamp: Date.now(),
-      version: '1.0'
+      version: this.CURRENT_VERSION
     };
     try {
       localStorage.setItem(this.SAVE_KEY, JSON.stringify(saveData));
@@ -57,7 +58,7 @@ export class SaveManager {
       const saved = localStorage.getItem(this.SAVE_KEY);
       if (!saved) return null;
       
-      const gameData = JSON.parse(saved);
+      const gameData = this.migrate(JSON.parse(saved));
       
       // Verificar se não é muito antigo (7 dias)
       const daysSinceSave = (Date.now() - gameData.timestamp) / (1000 * 60 * 60 * 24);
@@ -72,6 +73,21 @@ export class SaveManager {
       this.clearSave();
       return null;
     }
+  }
+
+  /**
+   * Migra save antigo para a versão corrente
+   * @param {Object} data - Dados brutos do save
+   * @returns {Object} Dados migrados
+   */
+  migrate(data) {
+    if (!data) return null;
+    // Versões anteriores não tinham version numérico; padronizar
+    const version = typeof data.version === 'number' ? data.version : 1;
+    let current = { ...data, version };
+    // Espaço para futuras migrações:
+    // if (version < 2) { current = migrateToV2(current); }
+    return current;
   }
 
   /**

@@ -71,8 +71,8 @@ export class GameController {
       this.hideGameButtons();
       this.animationManager.startGridAnimation();
       if (typeof this.gameState.on === 'function') {
-        this.gameState.on('modeChange', () => this.autoSave());
-        this.gameState.on('boardChange', () => this.autoSave());
+        this.gameState.on('modeChange', () => this.debouncedAutoSave && this.debouncedAutoSave());
+        this.gameState.on('boardChange', () => this.debouncedAutoSave && this.debouncedAutoSave());
       }
       
       // Registrar service worker para PWA
@@ -246,17 +246,6 @@ export class GameController {
         playerCompleted: this.gameState.playerCompleted,
         lastHintTime: this.gameState.lastHintTime,
         isImageMode: this.gameState.getImageMode(),
-        cellsValues: this.gameState.cells.map((cell) => ({
-          value: cell.value,
-          disabled: cell.disabled,
-          classList: Array.from(cell.classList),
-          dataValue: cell.getAttribute("data-value"),
-          backgroundImage: cell.style.backgroundImage,
-        })),
-        gameButtonsVisible: {
-          solve: document.getElementById("solve-button")?.style.display !== "none",
-          hint: document.getElementById("hint-button")?.style.display !== "none",
-        },
       };
     } catch (error) {
       console.error('Erro ao salvar estado atual:', error);
@@ -286,22 +275,9 @@ export class GameController {
       // Restaurar modo de imagem
       this.imageMode.setMode(this.previousGameState.isImageMode);
 
-      // Restaurar células
-      this.gameState.cells.forEach((cell, index) => {
-        const savedCell = this.previousGameState.cellsValues[index];
-        if (savedCell) {
-          cell.value = savedCell.value;
-          cell.disabled = savedCell.disabled;
-          cell.className = savedCell.classList.join(" ");
-
-          if (savedCell.dataValue) {
-            cell.setAttribute("data-value", savedCell.dataValue);
-          }
-          if (savedCell.backgroundImage) {
-            cell.style.backgroundImage = savedCell.backgroundImage;
-          }
-        }
-      });
+      // Repreencher células a partir do estado lógico
+      this.gridManager.fillCells(this.gameState.currentBoard);
+      this.gridManager.enableCells();
 
       // Restaurar timer
       if (this.previousGameState.timerRunning) {
@@ -311,19 +287,9 @@ export class GameController {
         this.timer.updateDisplay();
       }
 
-      // Restaurar visibilidade dos botões
-      const solveButton = document.getElementById("solve-button");
-      const hintButton = document.getElementById("hint-button");
-      if (solveButton) {
-        solveButton.style.display = this.previousGameState.gameButtonsVisible.solve
-          ? "inline-block"
-          : "none";
-      }
-      if (hintButton) {
-        hintButton.style.display = this.previousGameState.gameButtonsVisible.hint
-          ? "inline-block"
-          : "none";
-      }
+      // Reapresentar controles padrão do jogo
+      this.showGameButtons();
+      this.imageMode.updateAllCells();
 
       // Reabilitar botão de novo jogo
       const newGameButton = document.getElementById("new-game-button");
@@ -725,12 +691,14 @@ export class GameController {
    */
   setupAutoSave() {
     try {
-      // Salvar automaticamente a cada 30 segundos
-      this.autoSaveInterval = setInterval(() => {
-        if (this.gameState.currentBoard.some(row => row.some(cell => cell !== 0))) {
+      this._debounceTimer = null;
+      this._debounceMs = 1500;
+      this.debouncedAutoSave = () => {
+        if (this._debounceTimer) clearTimeout(this._debounceTimer);
+        this._debounceTimer = setTimeout(() => {
           this.autoSave();
-        }
-      }, 30000);
+        }, this._debounceMs);
+      };
     } catch (error) {
       console.error('Erro ao configurar auto-save:', error);
     }
