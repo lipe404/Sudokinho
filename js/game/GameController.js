@@ -477,36 +477,80 @@ export class GameController {
    */
   generateSudoku() {
     try {
-      this.gameState.resetGameState();
-      this.gridManager.clearAllCells();
-
-      this.sudokuGenerator.fillBoard(this.gameState.currentBoard);
-      this.gameState.solutionBoard = this.gameState.currentBoard.map((row) => [
-        ...row,
-      ]);
-      this.sudokuGenerator.removeNumbers(
-        this.gameState.currentBoard,
-        this.gameState.currentDifficulty
-      );
-
-      this.gridManager.fillCells(this.gameState.currentBoard);
-      this.showGameButtons();
-      this.gameState.animacaoAtiva = false;
-
-      // Salvar estado inicial no histórico
-      const initialBoard = this.gridManager.getCurrentBoardState();
-      this.historyManager.saveState(initialBoard);
-      this.updateUndoRedoButtons();
-
-      // Atualizar display baseado no modo atual
-      this.imageMode.updateAllCells();
-      
-      // Salvar jogo
-      this.autoSave();
+      const useWorker = typeof Worker !== 'undefined';
+      if (useWorker) {
+        this.generateSudokuWithWorker();
+      } else {
+        this.generateSudokuSync();
+      }
     } catch (error) {
       console.error('Erro ao gerar Sudoku:', error);
       this.showErrorModal('Erro ao gerar novo Sudoku. Tente novamente.');
     }
+  }
+
+  generateSudokuSync() {
+    this.gameState.resetGameState();
+    this.gridManager.clearAllCells();
+    const t0 = performance.now();
+    this.sudokuGenerator.fillBoard(this.gameState.currentBoard);
+    const t1 = performance.now();
+    this.gameState.solutionBoard = this.gameState.currentBoard.map((row) => [...row]);
+    this.sudokuGenerator.removeNumbers(this.gameState.currentBoard, this.gameState.currentDifficulty);
+    const t2 = performance.now();
+    this.gridManager.fillCells(this.gameState.currentBoard);
+    this.showGameButtons();
+    this.gameState.animacaoAtiva = false;
+    const initialBoard = this.gridManager.getCurrentBoardState();
+    this.historyManager.saveState(initialBoard);
+    this.updateUndoRedoButtons();
+    this.imageMode.updateAllCells();
+    this.saveManager.saveStats({
+      lastGenerationMs: Math.round(t1 - t0),
+      lastRemovalMs: Math.round(t2 - t1),
+      lastRemovalAttempts: this.sudokuGenerator.lastRemovalAttempts || 0
+    });
+    this.autoSave();
+  }
+
+  generateSudokuWithWorker() {
+    this.gameState.resetGameState();
+    this.gridManager.clearAllCells();
+    const worker = new Worker('./js/workers/sudokuWorker.js', { type: 'module' });
+    worker.onmessage = (e) => {
+      const data = e.data;
+      if (data && data.type === 'generated') {
+        this.gameState.currentBoard = data.board.map(row => [...row]);
+        this.gameState.solutionBoard = data.solution.map(row => [...row]);
+        this.gridManager.fillCells(this.gameState.currentBoard);
+        this.showGameButtons();
+        this.gameState.animacaoAtiva = false;
+        const initialBoard = this.gridManager.getCurrentBoardState();
+        this.historyManager.saveState(initialBoard);
+        this.updateUndoRedoButtons();
+        this.imageMode.updateAllCells();
+        this.saveManager.saveStats({
+          lastGenerationMs: data.genMs || 0,
+          lastRemovalMs: data.removeMs || 0,
+          lastRemovalAttempts: data.attempts || 0
+        });
+        this.autoSave();
+        worker.terminate();
+      } else if (data && data.type === 'error') {
+        worker.terminate();
+        this.generateSudokuSync();
+      }
+    };
+    worker.onerror = () => {
+      worker.terminate();
+      this.generateSudokuSync();
+    };
+    worker.postMessage({
+      action: 'generate',
+      size: this.gameState.SIZE,
+      subgrid: this.gameState.SUBGRID_SIZE,
+      difficulty: this.gameState.currentDifficulty
+    });
   }
 
   /**

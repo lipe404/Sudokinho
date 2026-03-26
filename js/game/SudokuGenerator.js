@@ -4,70 +4,61 @@ export class SudokuGenerator {
   constructor(gameState) {
     this.gameState = gameState;
     this.helpers = new Helpers();
+    this.lastRemovalAttempts = 0;
   }
 
   fillBoard(board) {
-    for (let row = 0; row < this.gameState.SIZE; row++) {
-      for (let col = 0; col < this.gameState.SIZE; col++) {
-        if (board[row][col] === 0) {
-          const numbers = this.helpers.shuffleArray(
-            [...Array(this.gameState.SIZE).keys()].map((n) => n + 1)
-          );
-          for (const num of numbers) {
-            if (this.isValidPlacement(num, row, col, board)) {
-              board[row][col] = num;
-              if (this.fillBoard(board)) return true;
-              board[row][col] = 0;
-            }
-          }
-          return false;
-        }
-      }
+    const next = this.findNextCell(board);
+    if (!next) return true;
+    const { row, col, candidates } = next;
+    const nums = this.helpers.shuffleArray(candidates.slice());
+    for (const num of nums) {
+      board[row][col] = num;
+      if (this.fillBoard(board)) return true;
+      board[row][col] = 0;
     }
-    return true;
+    return false;
   }
 
   removeNumbers(board, difficulty) {
-    let cellsToRemove =
-      difficulty.min +
-      Math.floor(Math.random() * (difficulty.max - difficulty.min + 1));
-    let attempts = 0;
-
-    while (cellsToRemove > 0 && attempts < this.gameState.MAX_ATTEMPTS) {
-      const row = Math.floor(Math.random() * this.gameState.SIZE);
-      const col = Math.floor(Math.random() * this.gameState.SIZE);
-
-      if (board[row][col] !== 0) {
-        const temp = board[row][col];
-        board[row][col] = 0;
-        const boardCopy = board.map((row) => [...row]);
-
-        if (this.countSolutions(boardCopy) === 1) {
-          cellsToRemove--;
-        } else {
-          board[row][col] = temp;
-        }
-        attempts++;
+    let cellsToRemove = difficulty.min + Math.floor(Math.random() * (difficulty.max - difficulty.min + 1));
+    const positions = [];
+    for (let r = 0; r < this.gameState.SIZE; r++) {
+      for (let c = 0; c < this.gameState.SIZE; c++) {
+        positions.push({ r, c });
       }
     }
+    const order = this.helpers.shuffleArray(positions);
+    let attempts = 0;
+    for (let i = 0; i < order.length && cellsToRemove > 0 && attempts < this.gameState.MAX_ATTEMPTS; i++) {
+      const row = order[i].r;
+      const col = order[i].c;
+      if (board[row][col] === 0) continue;
+      const temp = board[row][col];
+      board[row][col] = 0;
+      const boardCopy = board.map((r) => [...r]);
+      if (this.countSolutions(boardCopy) === 1) {
+        cellsToRemove--;
+      } else {
+        board[row][col] = temp;
+      }
+      attempts++;
+    }
+    this.lastRemovalAttempts = attempts;
   }
 
   solveSudoku(board) {
-    for (let row = 0; row < this.gameState.SIZE; row++) {
-      for (let col = 0; col < this.gameState.SIZE; col++) {
-        if (board[row][col] === 0) {
-          for (let num = 1; num <= this.gameState.SIZE; num++) {
-            if (this.isValidPlacement(num, row, col, board)) {
-              board[row][col] = num;
-              if (this.solveSudoku(board)) return true;
-              board[row][col] = 0;
-            }
-          }
-          return false;
-        }
+    const next = this.findNextCell(board);
+    if (!next) return true;
+    const { row, col, candidates } = next;
+    for (const num of candidates) {
+      if (this.isValidPlacement(num, row, col, board)) {
+        board[row][col] = num;
+        if (this.solveSudoku(board)) return true;
+        board[row][col] = 0;
       }
     }
-    return true;
+    return false;
   }
 
   isValidPlacement(num, row, col, board) {
@@ -97,6 +88,26 @@ export class SudokuGenerator {
       }
     }
     return true;
+  }
+
+  findNextCell(board) {
+    let best = null;
+    let bestCount = 10;
+    for (let row = 0; row < this.gameState.SIZE; row++) {
+      for (let col = 0; col < this.gameState.SIZE; col++) {
+        if (board[row][col] !== 0) continue;
+        const candidates = [];
+        for (let num = 1; num <= this.gameState.SIZE; num++) {
+          if (this.isValidPlacement(num, row, col, board)) candidates.push(num);
+        }
+        if (candidates.length < bestCount) {
+          best = { row, col, candidates };
+          bestCount = candidates.length;
+          if (bestCount === 1) return best;
+        }
+      }
+    }
+    return best;
   }
 
   isCurrentBoardValid() {

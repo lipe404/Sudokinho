@@ -28,17 +28,6 @@ Este arquivo reúne perguntas e pontos de atenção técnicos para orientar deci
 - Queremos adotar um padrão de eventos/observables entre camadas (GameState ↔ UI) para reduzir chamadas diretas e facilitar testes?
   Resposta: Sim
 
-## Lógica do Jogo (Sudoku)
-
-- A estratégia de geração atual com backtracking puro em [SudokuGenerator.fillBoard](file:///c:/Users/toled/Documents/GitHub/Sudokinho/js/game/SudokuGenerator.js#L9-L28) é suficiente para as dificuldades, ou devemos usar heurísticas (bitmasks, MRV) para reduzir custo e variação de tempo?
-  Resposta: Vamos usar essas heurísticas para reduzir custo e variacao de tempo
-- O método de remoção de números [removeNumbers](file:///c:/Users/toled/Documents/GitHub/Sudokinho/js/game/SudokuGenerator.js#L30-L53) garante sempre uma solução única dentro de `MAX_ATTEMPTS`? Queremos métricas/telemetria para entender taxa de falha/tempo?
-  Resposta: Auditar e refinar este ponto
-- Devemos mover geração/validação para um Web Worker para não bloquear a UI em dispositivos lentos?
-  Resposta: Sim
-- A verificação de correção no fim de jogo em [Validator.checkIfPlayerCompletedBoard](file:///c:/Users/toled/Documents/GitHub/Sudokinho/js/utils/Validator.js#L9-L40) é o critério oficial de vitória, inclusive para conquistas? Há casos-limite a cobrir (p. ex., preenchimento automático/“solve”)?
-  Resposta: Auditar e refinar 
-
 ## UI/UX e Acessibilidade
 
 - Devemos implementar “focus trap” e retorno de foco nos modais além do ESC/click‑fora? Hoje o [ModalManager](file:///c:/Users/toled/Documents/GitHub/Sudokinho/js/ui/ModalManager.js#L45-L60) não gerencia foco; incluímos roving tabindex e aria-hidden adequados?
@@ -164,29 +153,6 @@ Este arquivo reúne perguntas e pontos de atenção técnicos para orientar deci
 
 - O jogo é 100% pt-BR. Há plano de i18n (pt/en/es)? Se sim, centralizamos mensagens em catálogos e removemos strings hardcoded de [index.html](file:///c:/Users/toled/Documents/GitHub/Sudokinho/index.html#L31-L101) e módulos?
   REsposta: 100% BR
-
-## Bugs, Inconsistências e Pontos de Refatoração
-
-- Em [style.css](file:///c:/Users/toled/Documents/GitHub/Sudokinho/style.css#L10-L13) a variável está escrita `--sucess-color`, mas é usada como `--success-color` em [style.css](file:///c:/Users/toled/Documents/GitHub/Sudokinho/style.css#L766-L772). Corrigimos a grafia e usos?
-  Resposta: Sim
-- Em [SaveManager.saveGame](file:///c:/Users/toled/Documents/GitHub/Sudokinho/js/utils/SaveManager.js#L17-L46) o `saveData` fora do escopo no `catch` impede o retry após `clearOldSaves`. Ajustamos o escopo e tratamos `QuotaExceededError/NS_ERROR_DOM_QUOTA_REACHED`?
-  Resposta: Sim
-- O botão “Press Start 2P” não é importado; incluímos o link de fonte em [index.html](file:///c:/Users/toled/Documents/GitHub/Sudokinho/index.html#L25-L30) ou mudamos a fonte no CSS [style.css](file:///c:/Users/toled/Documents/GitHub/Sudokinho/style.css#L79-L93)?
-  Respota: Sim
-- Paths absolutos no SW/manifest podem quebrar em subpaths ([service-worker.js](file:///c:/Users/toled/Documents/GitHub/Sudokinho/service-worker.js#L8-L30), [GameController](file:///c:/Users/toled/Documents/GitHub/Sudokinho/js/game/GameController.js#L814-L820), [manifest.json](file:///c:/Users/toled/Documents/GitHub/Sudokinho/manifest.json#L5-L11)). Padronizamos relativos?
-  Resposta: Padronizar
-- `backup_script.js` é código legado monolítico não referenciado. Mantemos como histórico ou removemos/arquivamos para reduzir confusão?
-  Resposta: Remover
-- Em [GridManager.fillCells](file:///c:/Users/toled/Documents/GitHub/Sudokinho/js/ui/GridManager.js#L291-L311), células fixas são desabilitadas e outras habilitadas depois em [enableCells](file:///c:/Users/toled/Documents/GitHub/Sudokinho/js/ui/GridManager.js#L283-L289). Queremos centralizar a política de habilitação para evitar estados inconsistentes?
-  REsposta: Sim, centralizar
-- Em [AudioController](file:///c:/Users/toled/Documents/GitHub/Sudokinho/js/ui/AudioController.js#L14-L28), dependendo do bloqueio de autoplay, os botões podem iniciar em estado visual trocado. Ajustamos a inicialização para refletir `play()`/`pause()` com “try…catch” e eventos de `onplay/onpause`?
-  REsposta: Sim
-- O `beforeunload` em [GameController.setupEventListeners](file:///c:/Users/toled/Documents/GitHub/Sudokinho/js/game/GameController.js#L128-L133) deve salvar de forma síncrona; queremos também salvar ao “visibilitychange” para maior robustez em mobile?
-  Resposta: Sim
-- Em [service-worker.js](file:///c:/Users/toled/Documents/GitHub/Sudokinho/service-worker.js#L99-L117) checamos `response.type === 'basic'`; respostas opacas do `no-cors` não passam. Ajustamos a estratégia para evitar inconsistências?
-  Resposta: Sim
-- Devemos mover estilos inline (ex.: highlights em [GridManager](file:///c:/Users/toled/Documents/GitHub/Sudokinho/js/ui/GridManager.js#L214-L245)) para classes CSS dedicadas e transições controladas?
-  REsposta: Sim
 
 ## API de Ranking (Opcional)
 
