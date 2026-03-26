@@ -4,9 +4,10 @@
  */
 export class HistoryManager {
   constructor(maxHistory = 50) {
-    this.history = [];
-    this.currentIndex = -1;
     this.maxHistory = maxHistory;
+    this.baseBoard = null;
+    this.changes = [];
+    this.currentIndex = -1;
   }
 
   /**
@@ -17,28 +18,55 @@ export class HistoryManager {
    */
   saveState(board, selectedCellIndex = null) {
     try {
-      // Remove estados futuros se houver undo
-      this.history = this.history.slice(0, this.currentIndex + 1);
-      
-      // Adiciona novo estado
-      const state = {
-        board: board.map(row => [...row]),
-        selectedCellIndex,
-        timestamp: Date.now()
-      };
-      
-      this.history.push(state);
-      this.currentIndex++;
-      
-      // Limita o tamanho do histórico
-      if (this.history.length > this.maxHistory) {
-        this.history.shift();
-        this.currentIndex--;
+      if (!this.baseBoard) {
+        this.baseBoard = board.map(row => [...row]);
+        this.changes = [];
+        this.currentIndex = -1;
+        return true;
       }
-      
+      const current = this.getBoardAt(this.currentIndex);
+      const diffs = [];
+      for (let r = 0; r < board.length; r++) {
+        for (let c = 0; c < board[r].length; c++) {
+          if (board[r][c] !== current[r][c]) {
+            diffs.push({ index: r * board.length + c, from: current[r][c], to: board[r][c], selectedCellIndex, timestamp: Date.now() });
+          }
+        }
+      }
+      diffs.forEach(d => this.saveDiff(d.index, d.from, d.to, d.selectedCellIndex));
       return true;
     } catch (error) {
       console.error('Erro ao salvar estado no histórico:', error);
+      return false;
+    }
+  }
+
+  /**
+   * Salva uma mudança pontual (diff) no histórico
+   * @param {number} cellIndex
+   * @param {number} from
+   * @param {number} to
+   * @param {number|null} selectedCellIndex
+   */
+  saveDiff(cellIndex, from, to, selectedCellIndex = null) {
+    try {
+      if (from === to) return false;
+      this.changes = this.changes.slice(0, this.currentIndex + 1);
+      const change = { index: cellIndex, from, to, selectedCellIndex, timestamp: Date.now() };
+      this.changes.push(change);
+      this.currentIndex++;
+      if (this.changes.length > this.maxHistory) {
+        const oldest = this.changes.shift();
+        if (this.baseBoard) {
+          const r = Math.floor(oldest.index / this.baseBoard.length);
+          const c = oldest.index % this.baseBoard.length;
+          this.baseBoard[r][c] = oldest.to;
+        }
+        this.currentIndex--;
+      }
+      return true;
+    } catch (error) {
+      console.error('Erro ao salvar diff no histórico:', error);
       return false;
     }
   }
@@ -48,11 +76,11 @@ export class HistoryManager {
    * @returns {Object|null} Estado anterior ou null se não houver
    */
   undo() {
-    if (this.canUndo()) {
-      this.currentIndex--;
-      return this.history[this.currentIndex];
-    }
-    return null;
+    if (!this.canUndo()) return null;
+    this.currentIndex--;
+    const board = this.getBoardAt(this.currentIndex);
+    const selectedCellIndex = this.changes[this.currentIndex + 1]?.selectedCellIndex ?? null;
+    return { board, selectedCellIndex, timestamp: Date.now() };
   }
 
   /**
@@ -60,11 +88,11 @@ export class HistoryManager {
    * @returns {Object|null} Estado seguinte ou null se não houver
    */
   redo() {
-    if (this.canRedo()) {
-      this.currentIndex++;
-      return this.history[this.currentIndex];
-    }
-    return null;
+    if (!this.canRedo()) return null;
+    this.currentIndex++;
+    const board = this.getBoardAt(this.currentIndex);
+    const selectedCellIndex = this.changes[this.currentIndex]?.selectedCellIndex ?? null;
+    return { board, selectedCellIndex, timestamp: Date.now() };
   }
 
   /**
@@ -72,7 +100,7 @@ export class HistoryManager {
    * @returns {boolean}
    */
   canUndo() {
-    return this.currentIndex > 0;
+    return this.currentIndex >= 0;
   }
 
   /**
@@ -80,14 +108,15 @@ export class HistoryManager {
    * @returns {boolean}
    */
   canRedo() {
-    return this.currentIndex < this.history.length - 1;
+    return this.currentIndex < this.changes.length - 1;
   }
 
   /**
    * Limpa todo o histórico
    */
   clear() {
-    this.history = [];
+    this.baseBoard = null;
+    this.changes = [];
     this.currentIndex = -1;
   }
 
@@ -96,7 +125,43 @@ export class HistoryManager {
    * @returns {number}
    */
   getHistorySize() {
-    return this.history.length;
+    return this.changes.length;
+  }
+
+  /**
+   * Ajusta o tamanho máximo do histórico
+   * @param {number} max
+   */
+  setMaxHistory(max) {
+    this.maxHistory = Math.max(1, parseInt(max) || 50);
+    while (this.changes.length > this.maxHistory) {
+      const oldest = this.changes.shift();
+      if (this.baseBoard) {
+        const r = Math.floor(oldest.index / this.baseBoard.length);
+        const c = oldest.index % this.baseBoard.length;
+        this.baseBoard[r][c] = oldest.to;
+      }
+      this.currentIndex--;
+    }
+  }
+
+  /**
+   * Obtém um snapshot do tabuleiro no índice atual
+   * @param {number} index
+   * @returns {number[][]}
+   */
+  getBoardAt(index) {
+    if (!this.baseBoard) return [];
+    const size = this.baseBoard.length;
+    const board = this.baseBoard.map(row => [...row]);
+    for (let i = 0; i <= index; i++) {
+      if (i < 0) continue;
+      const ch = this.changes[i];
+      const r = Math.floor(ch.index / size);
+      const c = ch.index % size;
+      board[r][c] = ch.to;
+    }
+    return board;
   }
 }
 

@@ -67,12 +67,7 @@ export class GridManager {
       return;
     }
 
-    // Salvar estado antes de apagar com Backspace ou Delete
-    if ((e.key === "Backspace" || e.key === "Delete") && cell.value && this.historyManager) {
-      const currentBoard = this.getCurrentBoardState();
-      const index = parseInt(cell.dataset.index);
-      this.historyManager.saveState(currentBoard, index);
-    }
+    // Consolidação: gravação ocorre no input, não no keydown
 
     // Navegação por setas entre células habilitadas
     const moveFocus = (deltaRow, deltaCol) => {
@@ -115,13 +110,6 @@ export class GridManager {
     }
 
     if (/^[1-9]$/.test(e.key)) {
-      // Salvar estado antes de inserir novo valor
-      if (this.historyManager && cell.value) {
-        const currentBoard = this.getCurrentBoardState();
-        const index = parseInt(cell.dataset.index);
-        this.historyManager.saveState(currentBoard, index);
-      }
-
       e.preventDefault();
       cell.value = e.key;
       cell.setAttribute("data-old-value", e.key);
@@ -162,13 +150,7 @@ export class GridManager {
       const newValue = cell.value;
       const oldValue = cell.getAttribute("data-old-value") || "";
 
-      // Salvar estado ANTES de fazer qualquer mudança (apenas se o valor realmente mudou)
-      if (this.historyManager && newValue !== oldValue && !cell.disabled) {
-        const currentBoard = this.getCurrentBoardState();
-        const index = parseInt(cell.dataset.index);
-        this.historyManager.saveState(currentBoard, index);
-        cell.setAttribute("data-old-value", newValue);
-      }
+      // Gravação consolidada será feita após definir o valor final
 
       if (newValue.length > 1) {
         cell.value = newValue.slice(-1);
@@ -189,6 +171,19 @@ export class GridManager {
           this.imageMode.updateCellDisplay(cell);
         }
 
+        if (this.historyManager && !cell.disabled) {
+          const index = parseInt(cell.dataset.index);
+          const from = oldValue ? parseInt(oldValue) || 0 : 0;
+          const to = cell.value ? parseInt(cell.value) || 0 : 0;
+          if (from !== to) {
+            this.historyManager.saveDiff(index, from, to, index);
+            if (this.onHistoryChange) {
+              this.onHistoryChange();
+            }
+          }
+          cell.setAttribute("data-old-value", cell.value || "");
+        }
+
         const completionData = this.validator.checkIfPlayerCompletedBoard();
         if (completionData && completionData.completed) {
           // Notificar GameController sobre conclusão
@@ -202,13 +197,12 @@ export class GridManager {
         } else {
           this.clearHighlights();
         }
-      if (this.gameState && typeof this.gameState.emit === 'function') {
-        this.gameState.emit('boardChange', this.getCurrentBoardState());
-      }
+        if (this.gameState && typeof this.gameState.emit === 'function') {
+          this.gameState.emit('boardChange', this.getCurrentBoardState());
+        }
       }
     } catch (error) {
       console.error('Erro ao validar input da célula:', error);
-    }
     }
   }
 
@@ -236,21 +230,7 @@ export class GridManager {
         return;
       }
 
-      // Salvar histórico quando o usuário sai da célula (apenas se houve mudança)
-      const currentValue = cell.value || "";
-      const oldValue = cell.getAttribute("data-old-value") || "";
-      
-      if (currentValue !== oldValue && this.historyManager) {
-        const currentBoard = this.getCurrentBoardState();
-        const index = parseInt(cell.dataset.index);
-        this.historyManager.saveState(currentBoard, index);
-        cell.setAttribute("data-old-value", currentValue);
-        
-        // Notificar que o histórico mudou (para atualizar botões undo/redo)
-        if (this.onHistoryChange) {
-          this.onHistoryChange();
-        }
-      }
+      // Removido: gravação redundante no blur
     } catch (error) {
       console.error('Erro ao processar blur da célula:', error);
     }

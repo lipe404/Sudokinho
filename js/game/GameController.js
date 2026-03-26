@@ -62,6 +62,17 @@ export class GameController {
       }
 
       this.modalManager.setup();
+      try {
+        const settings = this.saveManager.loadSettings() || {};
+        if (typeof settings.maxHistory !== 'number') {
+          const cores = typeof navigator !== 'undefined' && navigator.hardwareConcurrency ? navigator.hardwareConcurrency : 8;
+          settings.maxHistory = cores <= 4 ? 30 : 50;
+          this.saveManager.saveSettings(settings);
+        }
+        if (this.historyManager && typeof this.historyManager.setMaxHistory === 'function') {
+          this.historyManager.setMaxHistory(settings.maxHistory);
+        }
+      } catch (_) {}
       this.gridManager.createGrid();
       this.gridManager.setImageMode(this.imageMode);
       this.gridManager.setHistoryManager(this.historyManager);
