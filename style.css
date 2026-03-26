@@ -7,7 +7,7 @@
   --light-purple: #d8a4ff;
   --dark-purple: #3a136b;
   /* Cores de feedback */
-  --sucess-color: #4caf50;
+  --success-color: #4caf50;
   --error-color: #ff5555;
   --warning-color: #ff9800;
   --info-color: #2196f3;
@@ -160,6 +160,7 @@ h1::after {
 }
 .cell.highlight {
   background-color: var(--cell-highlight-bg);
+  box-shadow: 0 0 0 2px var(--primary-color);
 }
 .cell.highlight-fixed {
   background-color: var(--primary-color);

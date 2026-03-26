@@ -2,12 +2,12 @@
   "name": "Sudokinho - Jogo de Sudoku",
   "short_name": "Sudokinho",
   "description": "Um jogo de Sudoku divertido e desafiador",
-  "start_url": "/",
+  "start_url": ".",
   "display": "standalone",
   "background_color": "#8436c7",
   "theme_color": "#8436c7",
   "orientation": "portrait-primary",
-  "scope": "/",
+  "scope": ".",
   "icons": [
     {
       "src": "imgs/icon.ico",

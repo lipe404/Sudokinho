@@ -7,26 +7,26 @@ const RUNTIME_CACHE = 'sudokinho-runtime-v1.0.0';
 
 // Arquivos para cache estático
 const STATIC_CACHE_URLS = [
-  '/',
-  '/index.html',
-  '/style.css',
-  '/js/main.js',
-  '/js/game/GameController.js',
-  '/js/game/GameState.js',
-  '/js/game/SudokuGenerator.js',
-  '/js/ui/GridManager.js',
-  '/js/ui/AudioController.js',
-  '/js/ui/ModalManager.js',
-  '/js/ui/ImageMode.js',
-  '/js/utils/Helpers.js',
-  '/js/utils/Timer.js',
-  '/js/utils/Validator.js',
-  '/js/utils/HistoryManager.js',
-  '/js/utils/SaveManager.js',
-  '/js/animations/AnimationManager.js',
-  '/midia/music.mp3',
-  '/imgs/icon.ico',
-  '/imgs/icon.jpg'
+  './',
+  './index.html',
+  './style.css',
+  './js/main.js',
+  './js/game/GameController.js',
+  './js/game/GameState.js',
+  './js/game/SudokuGenerator.js',
+  './js/ui/GridManager.js',
+  './js/ui/AudioController.js',
+  './js/ui/ModalManager.js',
+  './js/ui/ImageMode.js',
+  './js/utils/Helpers.js',
+  './js/utils/Timer.js',
+  './js/utils/Validator.js',
+  './js/utils/HistoryManager.js',
+  './js/utils/SaveManager.js',
+  './js/animations/AnimationManager.js',
+  './midia/music.mp3',
+  './imgs/icon.ico',
+  './imgs/icon.jpg'
 ];
 
 // Instalação do Service Worker
@@ -36,17 +36,11 @@ self.addEventListener('install', (event) => {
     caches.open(CACHE_NAME)
       .then((cache) => {
         console.log('[Service Worker] Cacheando arquivos estáticos');
-        return cache.addAll(STATIC_CACHE_URLS.map(url => {
-          try {
-            return new Request(url, { mode: 'no-cors' });
-          } catch (e) {
-            return url;
-          }
-        })).catch((error) => {
-          console.warn('[Service Worker] Erro ao cachear alguns arquivos:', error);
-          // Continuar mesmo se alguns arquivos falharem
-          return Promise.resolve();
-        });
+        return cache.addAll(STATIC_CACHE_URLS)
+          .catch((error) => {
+            console.warn('[Service Worker] Erro ao cachear alguns arquivos:', error);
+            return Promise.resolve();
+          });
       })
       .then(() => {
         return self.skipWaiting();
@@ -99,15 +93,12 @@ self.addEventListener('fetch', (event) => {
         // Buscar da rede
         return fetch(event.request)
           .then((response) => {
-            // Não cachear respostas inválidas
-            if (!response || response.status !== 200 || response.type !== 'basic') {
+            if (!response || response.status !== 200) {
               return response;
             }
 
-            // Clonar resposta para cache
             const responseToCache = response.clone();
 
-            // Cachear em runtime cache
             caches.open(RUNTIME_CACHE)
               .then((cache) => {
                 cache.put(event.request, responseToCache);

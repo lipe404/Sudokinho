@@ -1,0 +1,208 @@
+# QUESTIONS – Sudokinho
+
+Este arquivo reúne perguntas e pontos de atenção técnicos para orientar decisões de arquitetura, refatoração, performance, segurança e DX. Responda diretamente a cada pergunta abaixo para desbloquear as próximas melhorias.
+
+**Referências de código** usam links clicáveis para facilitar a navegação.
+
+## Visão Geral
+
+- Qual é a visão de produto do Sudokinho (solo/PWA offline, ranking online, skins, achievements), e quais objetivos priorizar na próxima iteração?
+  Resposta: É um jogo solo, pwa offiline, mas com skins e achievements.
+- O projeto deve permanecer 100% client-side, ou teremos backend ativo (ranking, perfis, armazenamento remoto)?
+  Resposta: Sem backend por enquanto, apenas 100% client-side
+- Qual é o público-alvo e dispositivos prioritários (mobile-first, low-end, desktop)?
+  Resposta: Mobile-first
+- Há metas de acessibilidade (WCAG AA), tamanho de bundle e tempo de carregamento a cumprir?
+  Resposta: As mais acessiveis e perfomaticas possíveis
+
+## Arquitetura e Modularização
+
+- Consolidação de validações: podemos extrair a lógica de validação “isValidPlacement” para um módulo único compartilhado entre gerador, validador e UI, evitando duplicação em [SudokuGenerator.js](file:///c:/Users/toled/Documents/GitHub/Sudokinho/js/game/SudokuGenerator.js#L73-L100) e [Validator.js](file:///c:/Users/toled/Documents/GitHub/Sudokinho/js/utils/Validator.js#L64-L91)?
+  Resposta: Sim
+- O [Validator](file:///c:/Users/toled/Documents/GitHub/Sudokinho/js/utils/Validator.js#L1-L7) precisa realmente instanciar `ModalManager` se não exibe modais? Removemos essa dependência para reduzir acoplamento?
+  Resposta: Sim
+- Devemos mover funções de leitura do tabuleiro (“getCurrentBoardState”) para um util único para evitar duplicação em [GridManager](file:///c:/Users/toled/Documents/GitHub/Sudokinho/js/ui/GridManager.js#L313-L322), [SudokuGenerator](file:///c:/Users/toled/Documents/GitHub/Sudokinho/js/game/SudokuGenerator.js#L142-L151) e [Validator](file:///c:/Users/toled/Documents/GitHub/Sudokinho/js/utils/Validator.js#L93-L101)?
+  Resposta: Sim
+- Faz sentido introduzir um “core” (regras puras de Sudoku) sem dependência de DOM, para facilitar testes e eventualmente mover geração/validação para Web Workers?
+  Resposta: Vamos facilidar os testes para web workers ne
+- Queremos adotar um padrão de eventos/observables entre camadas (GameState ↔ UI) para reduzir chamadas diretas e facilitar testes?
+  Resposta: Sim
+
+## Lógica do Jogo (Sudoku)
+
+- A estratégia de geração atual com backtracking puro em [SudokuGenerator.fillBoard](file:///c:/Users/toled/Documents/GitHub/Sudokinho/js/game/SudokuGenerator.js#L9-L28) é suficiente para as dificuldades, ou devemos usar heurísticas (bitmasks, MRV) para reduzir custo e variação de tempo?
+  Resposta: Vamos usar essas heurísticas para reduzir custo e variacao de tempo
+- O método de remoção de números [removeNumbers](file:///c:/Users/toled/Documents/GitHub/Sudokinho/js/game/SudokuGenerator.js#L30-L53) garante sempre uma solução única dentro de `MAX_ATTEMPTS`? Queremos métricas/telemetria para entender taxa de falha/tempo?
+  Resposta: Auditar e refinar este ponto
+- Devemos mover geração/validação para um Web Worker para não bloquear a UI em dispositivos lentos?
+  Resposta: Sim
+- A verificação de correção no fim de jogo em [Validator.checkIfPlayerCompletedBoard](file:///c:/Users/toled/Documents/GitHub/Sudokinho/js/utils/Validator.js#L9-L40) é o critério oficial de vitória, inclusive para conquistas? Há casos-limite a cobrir (p. ex., preenchimento automático/“solve”)?
+  Resposta: Auditar e refinar 
+
+## UI/UX e Acessibilidade
+
+- Devemos implementar “focus trap” e retorno de foco nos modais além do ESC/click‑fora? Hoje o [ModalManager](file:///c:/Users/toled/Documents/GitHub/Sudokinho/js/ui/ModalManager.js#L45-L60) não gerencia foco; incluímos roving tabindex e aria-hidden adequados?
+  Resposta: Sim, refinar e auditar
+- O anúncio acessível (`aria-live`) em [index.html](file:///c:/Users/toled/Documents/GitHub/Sudokinho/index.html#L180-L183) será usado para eventos importantes (novo jogo, dica, erro)? Quais mensagens padronizar?
+  Resposta; Auditar e padronizar tudo
+- O temporizador com id `#timer` herdou estilos de botão em [style.css](file:///c:/Users/toled/Documents/GitHub/Sudokinho/style.css#L206-L238); queremos separar a aparência para não parecer clicável?
+  Resposta: Sim,separar para nao confundir
+- Devemos adicionar navegação por setas entre células (mover foco no grid) em [GridManager.handleKeyDown](file:///c:/Users/toled/Documents/GitHub/Sudokinho/js/ui/GridManager.js#L61-L116)?
+  Resposta: Sim
+- O autoplay do áudio em [index.html](file:///c:/Users/toled/Documents/GitHub/Sudokinho/index.html#L174-L179) deve ser removido para respeitar políticas de auto‑play e evitar UX inconsistente?
+  Resposta: Sim
+- A fonte “Press Start 2P” é usada no CSS [style.css](file:///c:/Users/toled/Documents/GitHub/Sudokinho/style.css#L79-L93), mas não é carregada no HTML. Devemos incluir o link de fonte no head de [index.html](file:///c:/Users/toled/Documents/GitHub/Sudokinho/index.html#L25-L30) ou padronizar outra tipografia?
+  Resposta: Sim
+- Em realce de números, preferimos classes CSS em vez de mutações de estilo inline em [GridManager.highlightSameNumbers](file:///c:/Users/toled/Documents/GitHub/Sudokinho/js/ui/GridManager.js#L222-L245) para performance/manutenção?
+  Resposta: Sim
+
+## Persistência e Estado
+
+- O auto‑save a cada 30s em [GameController.setupAutoSave](file:///c:/Users/toled/Documents/GitHub/Sudokinho/js/game/GameController.js#L666-L674) é agressivo o suficiente ou devemos debounçar por interação e salvar ao pausar/perder foco?
+  Resposta: Debounçar
+- A captura do snapshot completo do DOM/células em [GameController.saveCurrentGameState](file:///c:/Users/toled/Documents/GitHub/Sudokinho/js/game/GameController.js#L225-L248) é necessária ou conseguimos serializar apenas o estado lógico + preferências?
+  Resposta: Vamos serializar
+- Em [SaveManager.saveGame](file:///c:/Users/toled/Documents/GitHub/Sudokinho/js/utils/SaveManager.js#L17-L46), há um bug: o `saveData` é referenciado fora do escopo no bloco de `catch`. Confirmamos correção movendo a declaração para escopo externo e tratando múltiplos nomes de erro de quota?
+  Resposta: É um bug, audite refine e corrija
+- Devemos versionar o schema de save (ex.: `version: 1`) e implementar migrações para futuras mudanças?
+  Resposta: Sim
+
+## Histórico (Undo/Redo)
+
+- O histórico máximo de 50 estados em [HistoryManager](file:///c:/Users/toled/Documents/GitHub/Sudokinho/js/utils/HistoryManager.js#L5-L10) é adequado? Queremos torná-lo configurável por dispositivo/performance?
+  Resposta: Sim, torna configuravel
+- Devemos compactar diffs (célula/valor) em vez de guardar o tabuleiro completo por estado para reduzir memória?
+  Resposta: Sim
+- Existem pontos de gravação redundantes (keydown, input, blur) em [GridManager](file:///c:/Users/toled/Documents/GitHub/Sudokinho/js/ui/GridManager.js#L69-L83, file:///c:/Users/toled/Documents/GitHub/Sudokinho/js/ui/GridManager.js#L118-L131, file:///c:/Users/toled/Documents/GitHub/Sudokinho/js/ui/GridManager.js#L188-L212) que poderiam ser consolidados para evitar excesso de snapshots?
+  Resposta: Vamos consolidar
+
+## Modo Imagem
+
+- O [ImageMode](file:///c:/Users/toled/Documents/GitHub/Sudokinho/js/ui/ImageMode.js#L15-L28) pré-carrega apenas `.png`, mas existem `jpg/avif` em `imgs/assets/`. Devemos padronizar formato (preferir `avif` com fallback) e reduzir peso?
+  Resposta: Sim, padronizar
+- Ao trocar para imagem, o valor numérico é escondido via CSS inline [setCellImage](file:///c:/Users/toled/Documents/GitHub/Sudokinho/js/ui/ImageMode.js#L95-L105); queremos armazenar o número apenas em `data-*` e usar classes para estilização?
+  Resposta: Sim
+- Desejamos expor uma preferência persistente de modo (imagem/número) no [SaveManager](file:///c:/Users/toled/Documents/GitHub/Sudokinho/js/utils/SaveManager.js#L148-L157) como parte de “settings” em vez de no save do jogo?
+  Resposta: Sim
+
+## PWA (Service Worker e Manifest)
+
+- O registro do SW usa caminho absoluto em [GameController.registerServiceWorker](file:///c:/Users/toled/Documents/GitHub/Sudokinho/js/game/GameController.js#L814-L820). O app será servido em subpath (ex.: GitHub Pages `/Sudokinho/`)? Se sim, devemos trocar por caminho relativo.
+  Resposta: Usar caminho relativo, para usar no github subpages
+- O `start_url` e `scope` do [manifest.json](file:///c:/Users/toled/Documents/GitHub/Sudokinho/manifest.json#L5-L11) estão como “/”. Ajustamos para `./` para funcionar em subpath e melhorar offline?
+  REsposta: Sim
+- Em [service-worker.js](file:///c:/Users/toled/Documents/GitHub/Sudokinho/service-worker.js#L8-L30) os paths do pre-cache são absolutos; padronizamos paths relativos para compatibilidade em subpaths?
+  Resposta: Padronizar
+- O pre-cache usa `new Request(url, { mode: 'no-cors' })` em [service-worker.js](file:///c:/Users/toled/Documents/GitHub/Sudokinho/service-worker.js#L39-L45); queremos evitar `no-cors` (respostas opacas) e deixar o cache consistente com `fetch` real?
+  Resposta: Sim
+- Devemos remover áudio pesado do pre-cache [service-worker.js](file:///c:/Users/toled/Documents/GitHub/Sudokinho/service-worker.js#L27-L29) e cacheá-lo sob demanda para acelerar a instalação offline?
+  Resposta: Sim
+- Vamos implementar estratégia de atualização (skipWaiting/postMessage) integrada à UI para notificar “nova versão disponível”?
+  Resposta: Sim
+
+## Performance
+
+- Devemos mover animações do grid [AnimationManager](file:///c:/Users/toled/Documents/GitHub/Sudokinho/js/animations/AnimationManager.js#L7-L32) para `requestAnimationFrame` ou reduzir sombras/transições para dispositivos low‑end?
+  Resposta : Sim, melhorar perfomance
+- O tamanho/qualidade das imagens de “porquinhos” está adequado? Convertendo para `avif` com compressão mais agressiva melhora tempo de carregamento perceptível?
+  Resposta: Esta adequadro, mas melhorar perfomance
+- Precisamos de um limite/cancelamento para geração muito demorada de Sudoku com fallback em dificuldades altas?
+  Resposta: Sim
+- Há interesse em medições RUM (Web Vitals) e logs de performance (tempo para gerar, preencher, resolver)?
+  Resposta: Sim
+
+## Segurança (Front-end)
+
+- Em [ModalManager.showCustomAlert](file:///c:/Users/toled/Documents/GitHub/Sudokinho/js/ui/ModalManager.js#L19-L33) inserimos HTML condicionalmente via `innerHTML`. Como as strings são internas, o risco é baixo, mas queremos endurecer com sanitização ou aceitar somente DOM safe-list?
+  Resposta: Sim
+- Há risco de XSS via dados persistidos (localStorage) refletidos em UI no futuro? Devemos normatizar uma camada de encode/sanitize de UI?
+  Resposta: Sim
+- Como tratar resets de armazenamento para privacidade (limpar saves/achievements/stats facilmente)? Incluímos botão de “Limpar dados”?
+  Resposta: Limar saver e incluir botao limpar dados
+
+## Segurança (Back-end API de Ranking)
+
+- O backend opcional em [api/server.js](file:///c:/Users/toled/Documents/GitHub/Sudokinho/api/server.js#L1-L12) deve usar variáveis de ambiente (Mongo URI, porta) e gerenciar erros de conexão? Adotamos `dotenv` e validação?
+  Resposta: Nao utilizar dotenv
+- Precisamos de validação de entrada (nome/tempo), limites de taxa (rate-limit) e CORS restrito em [endpoints](file:///c:/Users/toled/Documents/GitHub/Sudokinho/api/server.js#L22-L36)?
+  Resposta: Sim
+- O ranking aceita apenas cliente confiável? Precisamos de assinatura do score (anti-cheat) ou vamos aceitar submissões honestas?
+  Resposta: Inserir anti cheat
+- Há plano de deploy do backend (prod/staging), logs e observabilidade? Será mantido neste repositório ou separado?
+  Resposta: sem backend por enquanto
+
+## Achievements
+
+- O armazenamento de conquistas em [AchievementsSystem](file:///c:/Users/toled/Documents/GitHub/Sudokinho/js/utils/AchievementsSystem.js#L86-L107) deveria ser versionado/namespaced para migrações?
+  Resposta: Sim, versionar
+- Regras de desbloqueio por tempo (1–10 min) consideram apenas vitórias manuais; manter assim é desejado? Devemos bloquear conquistas se “resolver” foi acionado pelo sistema?
+  Resposta: Sim, auditar e refinar
+- Queremos exibir uma tela de progresso contínuo de achievements ou manter apenas o modal atual [GameController.showAchievementsList](file:///c:/Users/toled/Documents/GitHub/Sudokinho/js/game/GameController.js#L987-L1023)?
+  Resposta: Criar progresso continuo
+
+## Qualidade, Tooling e CI
+
+- Devemos adicionar lint/format (ESLint + Prettier) e scripts de verificação? Qual padrão seguir (airbnb/base)?
+  Resposta: Não necesário
+- Queremos TypeScript para tipagem leve nas áreas “core” (gerador/validador) para reduzir erros e facilitar testes?
+  Respotsa: Sim
+- Vale adicionar testes unitários para o core de Sudoku (geração, solver, validador) e testes de integração de UI (Playwright)?
+  Resposta: Sim
+- Há interesse em GitHub Actions para rodar lint/teste e publicar PWA (ex.: para GitHub Pages)?
+  Resposta: Não necessário
+
+## Build/Deploy
+
+- Precisamos de bundler (Vite/Rollup) ou manter módulos ES estáticos é suficiente? Queremos gerar bundles otimizados para produção (minify, tree‑shaking)?
+  REsposta: Manter es estático
+- Vamos suportar navegadores legados ou apenas “módulos ES” modernos?
+  Resposta: Apenas modulos es modernos
+- Queremos pipeline para gerar ícones em múltiplos tamanhos e manifest automatizado?
+  resposta: Sim, manifest automatizao
+
+## Internacionalização
+
+- O jogo é 100% pt-BR. Há plano de i18n (pt/en/es)? Se sim, centralizamos mensagens em catálogos e removemos strings hardcoded de [index.html](file:///c:/Users/toled/Documents/GitHub/Sudokinho/index.html#L31-L101) e módulos?
+  REsposta: 100% BR
+
+## Bugs, Inconsistências e Pontos de Refatoração
+
+- Em [style.css](file:///c:/Users/toled/Documents/GitHub/Sudokinho/style.css#L10-L13) a variável está escrita `--sucess-color`, mas é usada como `--success-color` em [style.css](file:///c:/Users/toled/Documents/GitHub/Sudokinho/style.css#L766-L772). Corrigimos a grafia e usos?
+  Resposta: Sim
+- Em [SaveManager.saveGame](file:///c:/Users/toled/Documents/GitHub/Sudokinho/js/utils/SaveManager.js#L17-L46) o `saveData` fora do escopo no `catch` impede o retry após `clearOldSaves`. Ajustamos o escopo e tratamos `QuotaExceededError/NS_ERROR_DOM_QUOTA_REACHED`?
+  Resposta: Sim
+- O botão “Press Start 2P” não é importado; incluímos o link de fonte em [index.html](file:///c:/Users/toled/Documents/GitHub/Sudokinho/index.html#L25-L30) ou mudamos a fonte no CSS [style.css](file:///c:/Users/toled/Documents/GitHub/Sudokinho/style.css#L79-L93)?
+  Respota: Sim
+- Paths absolutos no SW/manifest podem quebrar em subpaths ([service-worker.js](file:///c:/Users/toled/Documents/GitHub/Sudokinho/service-worker.js#L8-L30), [GameController](file:///c:/Users/toled/Documents/GitHub/Sudokinho/js/game/GameController.js#L814-L820), [manifest.json](file:///c:/Users/toled/Documents/GitHub/Sudokinho/manifest.json#L5-L11)). Padronizamos relativos?
+  Resposta: Padronizar
+- `backup_script.js` é código legado monolítico não referenciado. Mantemos como histórico ou removemos/arquivamos para reduzir confusão?
+  Resposta: Remover
+- Em [GridManager.fillCells](file:///c:/Users/toled/Documents/GitHub/Sudokinho/js/ui/GridManager.js#L291-L311), células fixas são desabilitadas e outras habilitadas depois em [enableCells](file:///c:/Users/toled/Documents/GitHub/Sudokinho/js/ui/GridManager.js#L283-L289). Queremos centralizar a política de habilitação para evitar estados inconsistentes?
+  REsposta: Sim, centralizar
+- Em [AudioController](file:///c:/Users/toled/Documents/GitHub/Sudokinho/js/ui/AudioController.js#L14-L28), dependendo do bloqueio de autoplay, os botões podem iniciar em estado visual trocado. Ajustamos a inicialização para refletir `play()`/`pause()` com “try…catch” e eventos de `onplay/onpause`?
+  REsposta: Sim
+- O `beforeunload` em [GameController.setupEventListeners](file:///c:/Users/toled/Documents/GitHub/Sudokinho/js/game/GameController.js#L128-L133) deve salvar de forma síncrona; queremos também salvar ao “visibilitychange” para maior robustez em mobile?
+  Resposta: Sim
+- Em [service-worker.js](file:///c:/Users/toled/Documents/GitHub/Sudokinho/service-worker.js#L99-L117) checamos `response.type === 'basic'`; respostas opacas do `no-cors` não passam. Ajustamos a estratégia para evitar inconsistências?
+  Resposta: Sim
+- Devemos mover estilos inline (ex.: highlights em [GridManager](file:///c:/Users/toled/Documents/GitHub/Sudokinho/js/ui/GridManager.js#L214-L245)) para classes CSS dedicadas e transições controladas?
+  REsposta: Sim
+
+## API de Ranking (Opcional)
+
+- A API em [api/server.js](file:///c:/Users/toled/Documents/GitHub/Sudokinho/api/server.js#L1-L36) será parte do produto? Se sim, adicionamos validação (Joi/Zod), Helmet, rate limit, logs, autenticação (mínima) e testes?
+  Rsposta: Sim
+- Vamos integrar a UI ao ranking (exibir top‑10, enviar score quando o jogador vencer manualmente)? Quais critérios de envio (dificuldade, sem “resolver”, sem dicas)?
+  Resposta: exibir top 10, enviar score quando vencer manualmente, e nao enviar se clicar em resolver
+- Desejamos mover este backend para repositório separado com pipeline (Docker) ou mantemos junto ao front?
+  Resposta: Não
+
+## Roadmap de Melhorias (para priorizar após respostas)
+
+- Unificar regras de Sudoku em módulo puro + testes.
+- Corrigir variáveis CSS, fontes e paths PWA.
+- Refatorar SaveManager (bug de escopo) e versionar saves.
+- Implementar focus trap e navegação por teclado no grid.
+- Considerar Web Worker para geração/validação.
+- Otimizar imagens (avif) e remover áudio do pre‑cache.
+- Adicionar lint/tests/CI e planejar deploy (ex.: GitHub Pages).

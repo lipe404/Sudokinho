@@ -15,23 +15,26 @@ export class SaveManager {
    * @returns {boolean} True se salvou com sucesso
    */
   saveGame(gameData) {
+    const saveData = {
+      board: gameData.board,
+      solution: gameData.solution,
+      difficulty: gameData.difficulty,
+      time: gameData.time,
+      imageMode: gameData.imageMode,
+      timestamp: Date.now(),
+      version: '1.0'
+    };
     try {
-      const saveData = {
-        board: gameData.board,
-        solution: gameData.solution,
-        difficulty: gameData.difficulty,
-        time: gameData.time,
-        imageMode: gameData.imageMode,
-        timestamp: Date.now(),
-        version: '1.0'
-      };
-      
       localStorage.setItem(this.SAVE_KEY, JSON.stringify(saveData));
       return true;
     } catch (error) {
       console.error('Erro ao salvar jogo:', error);
-      // Se o localStorage estiver cheio, tentar limpar dados antigos
-      if (error.name === 'QuotaExceededError') {
+      const isQuotaError =
+        error &&
+        (error.name === 'QuotaExceededError' ||
+         error.name === 'NS_ERROR_DOM_QUOTA_REACHED' ||
+         error.name === 'QUOTA_EXCEEDED_ERR');
+      if (isQuotaError) {
         this.clearOldSaves();
         try {
           localStorage.setItem(this.SAVE_KEY, JSON.stringify(saveData));

@@ -214,8 +214,6 @@ export class GridManager {
   clearHighlights() {
     this.gameState.cells.forEach((c) => {
       c.classList.remove("highlight", "selected", "highlight-fixed");
-      c.style.backgroundColor = "";
-      c.style.boxShadow = "";
     });
   }
 
@@ -233,12 +231,8 @@ export class GridManager {
       if (cell.value === clickedValue) {
         if (cell.classList.contains("fixed")) {
           cell.classList.add("highlight-fixed");
-          cell.style.backgroundColor = "#d8a4ff";
-          cell.style.boxShadow = "0 0 0 2px #8436c7";
         } else {
           cell.classList.add("highlight");
-          cell.style.backgroundColor = "#d8a4ff";
-          cell.style.boxShadow = "0 0 0 2px #8436c7";
         }
       }
     });
@@ -257,12 +251,8 @@ export class GridManager {
       if (cell.value === value) {
         if (cell.classList.contains("fixed")) {
           cell.classList.add("highlight-fixed");
-          cell.style.backgroundColor = "#d8a4ff";
-          cell.style.boxShadow = "0 0 0 2px #8436c7";
         } else {
           cell.classList.add("highlight");
-          cell.style.backgroundColor = "#d8a4ff";
-          cell.style.boxShadow = "0 0 0 2px #8436c7";
         }
       }
     });
@@ -282,9 +272,7 @@ export class GridManager {
 
   enableCells() {
     this.gameState.cells.forEach((cell) => {
-      if (!cell.classList.contains("pre-filled")) {
-        cell.disabled = false;
-      }
+      cell.disabled = cell.classList.contains("fixed");
     });
   }
 

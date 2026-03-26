@@ -127,6 +127,13 @@ export class GameController {
       
       // Salvar antes de sair
       window.addEventListener("beforeunload", () => this.autoSave());
+      
+      // Salvar ao perder visibilidade (robustez em mobile)
+      document.addEventListener("visibilitychange", () => {
+        if (document.hidden) {
+          this.autoSave();
+        }
+      });
     } catch (error) {
       console.error('Erro ao configurar event listeners:', error);
     }
@@ -815,7 +822,7 @@ export class GameController {
     try {
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
-          navigator.serviceWorker.register('/service-worker.js')
+          navigator.serviceWorker.register('./service-worker.js')
             .then((registration) => {
               console.log('Service Worker registrado com sucesso:', registration.scope);
             })
