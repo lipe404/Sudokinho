@@ -15,30 +15,6 @@ Este arquivo reúne perguntas e pontos de atenção técnicos para orientar deci
 - Há metas de acessibilidade (WCAG AA), tamanho de bundle e tempo de carregamento a cumprir?
   Resposta: As mais acessiveis e perfomaticas possíveis
 
-## Modo Imagem
-
-- O [ImageMode](file:///c:/Users/toled/Documents/GitHub/Sudokinho/js/ui/ImageMode.js#L15-L28) pré-carrega apenas `.png`, mas existem `jpg/avif` em `imgs/assets/`. Devemos padronizar formato (preferir `avif` com fallback) e reduzir peso?
-  Resposta: Sim, padronizar
-- Ao trocar para imagem, o valor numérico é escondido via CSS inline [setCellImage](file:///c:/Users/toled/Documents/GitHub/Sudokinho/js/ui/ImageMode.js#L95-L105); queremos armazenar o número apenas em `data-*` e usar classes para estilização?
-  Resposta: Sim
-- Desejamos expor uma preferência persistente de modo (imagem/número) no [SaveManager](file:///c:/Users/toled/Documents/GitHub/Sudokinho/js/utils/SaveManager.js#L148-L157) como parte de “settings” em vez de no save do jogo?
-  Resposta: Sim
-
-## PWA (Service Worker e Manifest)
-
-- O registro do SW usa caminho absoluto em [GameController.registerServiceWorker](file:///c:/Users/toled/Documents/GitHub/Sudokinho/js/game/GameController.js#L814-L820). O app será servido em subpath (ex.: GitHub Pages `/Sudokinho/`)? Se sim, devemos trocar por caminho relativo.
-  Resposta: Usar caminho relativo, para usar no github subpages
-- O `start_url` e `scope` do [manifest.json](file:///c:/Users/toled/Documents/GitHub/Sudokinho/manifest.json#L5-L11) estão como “/”. Ajustamos para `./` para funcionar em subpath e melhorar offline?
-  REsposta: Sim
-- Em [service-worker.js](file:///c:/Users/toled/Documents/GitHub/Sudokinho/service-worker.js#L8-L30) os paths do pre-cache são absolutos; padronizamos paths relativos para compatibilidade em subpaths?
-  Resposta: Padronizar
-- O pre-cache usa `new Request(url, { mode: 'no-cors' })` em [service-worker.js](file:///c:/Users/toled/Documents/GitHub/Sudokinho/service-worker.js#L39-L45); queremos evitar `no-cors` (respostas opacas) e deixar o cache consistente com `fetch` real?
-  Resposta: Sim
-- Devemos remover áudio pesado do pre-cache [service-worker.js](file:///c:/Users/toled/Documents/GitHub/Sudokinho/service-worker.js#L27-L29) e cacheá-lo sob demanda para acelerar a instalação offline?
-  Resposta: Sim
-- Vamos implementar estratégia de atualização (skipWaiting/postMessage) integrada à UI para notificar “nova versão disponível”?
-  Resposta: Sim
-
 ## Performance
 
 - Devemos mover animações do grid [AnimationManager](file:///c:/Users/toled/Documents/GitHub/Sudokinho/js/animations/AnimationManager.js#L7-L32) para `requestAnimationFrame` ou reduzir sombras/transições para dispositivos low‑end?

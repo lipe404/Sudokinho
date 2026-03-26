@@ -27,7 +27,6 @@ const STATIC_CACHE_URLS = [
   './js/utils/HistoryManager.js',
   './js/utils/SaveManager.js',
   './js/animations/AnimationManager.js',
-  './midia/music.mp3',
   './imgs/icon.ico',
   './imgs/icon.jpg'
 ];
@@ -68,6 +67,12 @@ self.addEventListener('activate', (event) => {
     })
     .then(() => {
       return self.clients.claim();
+    })
+    .then(async () => {
+      const clientsList = await self.clients.matchAll({ type: 'window' });
+      for (const client of clientsList) {
+        try { client.postMessage({ type: 'UPDATED' }); } catch (e) {}
+      }
     })
   );
 });
@@ -113,7 +118,7 @@ self.addEventListener('fetch', (event) => {
             console.error('[Service Worker] Erro ao buscar recurso:', error);
             // Retornar página offline se disponível
             if (event.request.destination === 'document') {
-              return caches.match('/index.html');
+              return caches.match('./index.html');
             }
           });
       })

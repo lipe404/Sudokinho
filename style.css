@@ -166,6 +166,16 @@ h1::after {
   background-color: var(--primary-color);
   box-shadow: 0 0 0 2px var(--primary-color);
 }
+
+/* Modo imagem das células: oculta texto e posiciona imagem */
+.cell.image-mode {
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  color: transparent;
+  font-size: 0;
+  text-shadow: none;
+}
 .cell.invalid {
   background-color: var(--error-color);
   color: var(--white);

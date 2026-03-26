@@ -15,12 +15,26 @@ export class ImageMode {
   preloadImages() {
     try {
       for (let i = 1; i <= 9; i++) {
+        const avif = `imgs/assets/pig${i}.avif`;
+        const png = `imgs/assets/pig${i}.png`;
+        const jpg = `imgs/assets/pig${i}.jpg`;
         const img = new Image();
-        img.src = `imgs/assets/pig${i}.png`;
-        img.onerror = () => {
-          console.warn(`Imagem pig${i}.png não encontrada`);
+        img.onload = () => {
+          this.pigImages[i] = avif;
         };
-        this.pigImages[i] = img;
+        img.onerror = () => {
+          const imgFallback = new Image();
+          imgFallback.onload = () => {
+            this.pigImages[i] = png;
+          };
+          imgFallback.onerror = () => {
+            this.pigImages[i] = jpg;
+          };
+          imgFallback.src = png;
+        };
+        img.src = avif;
+        // Define um default imediato enquanto carrega
+        this.pigImages[i] = avif;
       }
     } catch (error) {
       console.error('Erro ao pré-carregar imagens:', error);
@@ -36,6 +50,11 @@ export class ImageMode {
       this.gameState.setImageMode(newMode);
       this.updateAllCells();
       this.updateModeButton();
+      try {
+        const settings = JSON.parse(localStorage.getItem('sudokinho_settings') || '{}');
+        settings.imageMode = newMode;
+        localStorage.setItem('sudokinho_settings', JSON.stringify(settings));
+      } catch (_) {}
     } catch (error) {
       console.error('Erro ao alternar modo de imagem:', error);
     }
@@ -50,6 +69,11 @@ export class ImageMode {
       this.gameState.setImageMode(isImageMode);
       this.updateAllCells();
       this.updateModeButton();
+      try {
+        const settings = JSON.parse(localStorage.getItem('sudokinho_settings') || '{}');
+        settings.imageMode = isImageMode;
+        localStorage.setItem('sudokinho_settings', JSON.stringify(settings));
+      } catch (_) {}
     } catch (error) {
       console.error('Erro ao definir modo de imagem:', error);
     }
@@ -95,12 +119,9 @@ export class ImageMode {
   setCellImage(cell, number) {
     try {
       if (number >= 1 && number <= 9 && cell) {
-        cell.style.backgroundImage = `url('imgs/assets/pig${number}.png')`;
-        cell.style.backgroundSize = "contain";
-        cell.style.backgroundRepeat = "no-repeat";
-        cell.style.backgroundPosition = "center";
-        cell.style.color = "transparent";
-        cell.style.fontSize = "0";
+        const url = this.pigImages[number] || `imgs/assets/pig${number}.png`;
+        cell.style.backgroundImage = `url('${url}')`;
+        cell.classList.add('image-mode');
         cell.setAttribute("data-value", number);
       }
     } catch (error) {
@@ -117,8 +138,7 @@ export class ImageMode {
       if (!cell) return;
 
       cell.style.backgroundImage = "none";
-      cell.style.color = "";
-      cell.style.fontSize = "";
+      cell.classList.remove('image-mode');
 
       const dataValue = cell.getAttribute("data-value");
       if (dataValue) {

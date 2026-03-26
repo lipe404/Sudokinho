@@ -211,7 +211,12 @@ export class GameController {
     try {
       this.imageMode.toggleMode();
       this.gridManager.setImageMode(this.imageMode);
-      this.autoSave();
+      try {
+        const settings = this.saveManager.loadSettings() || {};
+        settings.imageMode = this.gameState.getImageMode();
+        this.saveManager.saveSettings(settings);
+      } catch (_) {}
+      if (this.debouncedAutoSave) this.debouncedAutoSave();
     } catch (error) {
       console.error('Erro ao alternar modo de imagem:', error);
     }
@@ -724,8 +729,7 @@ export class GameController {
         board: this.gameState.currentBoard,
         solution: this.gameState.solutionBoard,
         difficulty: this.gameState.currentDifficulty,
-        time: this.gameState.timer.seconds,
-        imageMode: this.gameState.getImageMode()
+        time: this.gameState.timer.seconds
       };
       this.saveManager.saveGame(gameData);
     } catch (error) {
@@ -814,8 +818,10 @@ export class GameController {
         // Restaurar timer
         this.timer.restoreAndStart(saved.time || 0);
         
-        // Restaurar modo de imagem
-        this.imageMode.setMode(saved.imageMode || false);
+        // Restaurar modo de imagem a partir de settings (fallback ao save antigo)
+        const settings = this.saveManager.loadSettings() || {};
+        const mode = typeof settings.imageMode === 'boolean' ? settings.imageMode : (saved.imageMode || false);
+        this.imageMode.setMode(mode);
         
         // Preencher células
         this.gridManager.fillCells(saved.board);
@@ -857,6 +863,25 @@ export class GameController {
           navigator.serviceWorker.register('./service-worker.js')
             .then((registration) => {
               console.log('Service Worker registrado com sucesso:', registration.scope);
+              if (registration.waiting) {
+                this.notifyUpdateAvailable();
+              }
+              registration.addEventListener('updatefound', () => {
+                const newWorker = registration.installing;
+                if (!newWorker) return;
+                newWorker.addEventListener('statechange', () => {
+                  if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                    this.notifyUpdateAvailable();
+                  }
+                });
+              });
+              if (navigator.serviceWorker && navigator.serviceWorker.addEventListener) {
+                navigator.serviceWorker.addEventListener('message', (event) => {
+                  if (event.data && event.data.type === 'UPDATED') {
+                    this.notifyUpdateAvailable();
+                  }
+                });
+              }
             })
             .catch((error) => {
               console.warn('Erro ao registrar Service Worker:', error);
@@ -866,6 +891,17 @@ export class GameController {
     } catch (error) {
       console.error('Erro ao registrar Service Worker:', error);
     }
+  }
+
+  notifyUpdateAvailable() {
+    try {
+      this.modalManager.showCustomAlert(
+        'Atualização disponível',
+        'Uma nova versão do Sudokinho está pronta. Recarregue a página para aplicar as atualizações.',
+        'info'
+      );
+      this.modalManager.announce('Nova versão disponível. Recarregue a página.');
+    } catch (_) {}
   }
 
   /**
