@@ -1,4 +1,6 @@
 import { Helpers } from "../utils/Helpers.js";
+import { isValidPlacement, findNextCell, countSolutions } from "../core/SudokuCore.js";
+import { getBoardFromCells } from "../core/BoardUtils.js";
 
 export class SudokuGenerator {
   constructor(gameState) {
@@ -8,7 +10,7 @@ export class SudokuGenerator {
   }
 
   fillBoard(board) {
-    const next = this.findNextCell(board);
+    const next = findNextCell(board, this.gameState.SIZE, this.gameState.SUBGRID_SIZE);
     if (!next) return true;
     const { row, col, candidates } = next;
     const nums = this.helpers.shuffleArray(candidates.slice());
@@ -37,7 +39,7 @@ export class SudokuGenerator {
       const temp = board[row][col];
       board[row][col] = 0;
       const boardCopy = board.map((r) => [...r]);
-      if (this.countSolutions(boardCopy) === 1) {
+      if (countSolutions(boardCopy, this.gameState.SIZE, this.gameState.SUBGRID_SIZE) === 1) {
         cellsToRemove--;
       } else {
         board[row][col] = temp;
@@ -48,66 +50,17 @@ export class SudokuGenerator {
   }
 
   solveSudoku(board) {
-    const next = this.findNextCell(board);
+    const next = findNextCell(board, this.gameState.SIZE, this.gameState.SUBGRID_SIZE);
     if (!next) return true;
     const { row, col, candidates } = next;
     for (const num of candidates) {
-      if (this.isValidPlacement(num, row, col, board)) {
+      if (isValidPlacement(num, row, col, board, this.gameState.SIZE, this.gameState.SUBGRID_SIZE)) {
         board[row][col] = num;
         if (this.solveSudoku(board)) return true;
         board[row][col] = 0;
       }
     }
     return false;
-  }
-
-  isValidPlacement(num, row, col, board) {
-    // Verifica linha e coluna
-    for (let i = 0; i < this.gameState.SIZE; i++) {
-      if (
-        (board[row][i] === num && i !== col) ||
-        (board[i][col] === num && i !== row)
-      ) {
-        return false;
-      }
-    }
-
-    // Verifica quadrante 3x3
-    const startRow =
-      Math.floor(row / this.gameState.SUBGRID_SIZE) *
-      this.gameState.SUBGRID_SIZE;
-    const startCol =
-      Math.floor(col / this.gameState.SUBGRID_SIZE) *
-      this.gameState.SUBGRID_SIZE;
-
-    for (let i = startRow; i < startRow + this.gameState.SUBGRID_SIZE; i++) {
-      for (let j = startCol; j < startCol + this.gameState.SUBGRID_SIZE; j++) {
-        if (board[i][j] === num && i !== row && j !== col) {
-          return false;
-        }
-      }
-    }
-    return true;
-  }
-
-  findNextCell(board) {
-    let best = null;
-    let bestCount = 10;
-    for (let row = 0; row < this.gameState.SIZE; row++) {
-      for (let col = 0; col < this.gameState.SIZE; col++) {
-        if (board[row][col] !== 0) continue;
-        const candidates = [];
-        for (let num = 1; num <= this.gameState.SIZE; num++) {
-          if (this.isValidPlacement(num, row, col, board)) candidates.push(num);
-        }
-        if (candidates.length < bestCount) {
-          best = { row, col, candidates };
-          bestCount = candidates.length;
-          if (bestCount === 1) return best;
-        }
-      }
-    }
-    return best;
   }
 
   isCurrentBoardValid() {
@@ -118,7 +71,7 @@ export class SudokuGenerator {
         const num = board[row][col];
         if (num !== 0) {
           board[row][col] = 0;
-          if (!this.isValidPlacement(num, row, col, board)) {
+          if (!isValidPlacement(num, row, col, board, this.gameState.SIZE, this.gameState.SUBGRID_SIZE)) {
             this.highlightInvalidCell(row, col);
             board[row][col] = num;
             return false;
@@ -130,35 +83,8 @@ export class SudokuGenerator {
     return true;
   }
 
-  countSolutions(board, count = 0) {
-    if (count >= 2) return count;
-
-    for (let row = 0; row < this.gameState.SIZE; row++) {
-      for (let col = 0; col < this.gameState.SIZE; col++) {
-        if (board[row][col] === 0) {
-          for (let num = 1; num <= this.gameState.SIZE; num++) {
-            if (this.isValidPlacement(num, row, col, board)) {
-              board[row][col] = num;
-              count = this.countSolutions(board, count);
-              board[row][col] = 0;
-            }
-          }
-          return count;
-        }
-      }
-    }
-    return count + 1;
-  }
-
   getCurrentBoardState() {
-    const board = this.gameState.createEmptyBoard();
-    for (let i = 0; i < this.gameState.cells.length; i++) {
-      const value = parseInt(this.gameState.cells[i].value);
-      const row = Math.floor(i / this.gameState.SIZE);
-      const col = i % this.gameState.SIZE;
-      board[row][col] = isNaN(value) ? 0 : value;
-    }
-    return board;
+    return getBoardFromCells(this.gameState.cells, this.gameState.SIZE);
   }
 
   highlightInvalidCell(row, col) {

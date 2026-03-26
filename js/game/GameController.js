@@ -70,6 +70,10 @@ export class GameController {
       this.audioController.setup();
       this.hideGameButtons();
       this.animationManager.startGridAnimation();
+      if (typeof this.gameState.on === 'function') {
+        this.gameState.on('modeChange', () => this.autoSave());
+        this.gameState.on('boardChange', () => this.autoSave());
+      }
       
       // Registrar service worker para PWA
       this.registerServiceWorker();

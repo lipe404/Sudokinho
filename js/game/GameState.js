@@ -50,6 +50,7 @@ export class GameState {
       startTime: null,
       gameStartTime: null
     };
+    this._listeners = {};
   }
 
   /**
@@ -117,6 +118,9 @@ export class GameState {
    */
   setImageMode(enabled) {
     this.ui.imageMode = enabled;
+    if (this._listeners && this._listeners['modeChange']) {
+      this.emit('modeChange', enabled);
+    }
   }
 
   /**
@@ -148,5 +152,24 @@ export class GameState {
   resetCounters() {
     this.hintsUsed = 0;
     this.errors = 0;
+  }
+
+  on(event, handler) {
+    if (!this._listeners[event]) this._listeners[event] = new Set();
+    this._listeners[event].add(handler);
+  }
+
+  off(event, handler) {
+    if (this._listeners[event]) this._listeners[event].delete(handler);
+  }
+
+  emit(event, payload) {
+    const set = this._listeners[event];
+    if (!set) return;
+    for (const h of set) {
+      try {
+        h(payload);
+      } catch (_) {}
+    }
   }
 }

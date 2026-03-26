@@ -1,9 +1,9 @@
-import { ModalManager } from "../ui/ModalManager.js";
+import { isValidPlacement } from "../core/SudokuCore.js";
+import { getBoardFromCells } from "../core/BoardUtils.js";
 
 export class Validator {
   constructor(gameState) {
     this.gameState = gameState;
-    this.modalManager = new ModalManager();
   }
 
   checkIfPlayerCompletedBoard() {
@@ -53,7 +53,7 @@ export class Validator {
       for (let col = 0; col < this.gameState.SIZE; col++) {
         const value = board[row][col];
         board[row][col] = 0;
-        const isValid = this.isValidPlacement(value, row, col, board);
+        const isValid = isValidPlacement(value, row, col, board, this.gameState.SIZE, this.gameState.SUBGRID_SIZE);
         board[row][col] = value;
         if (!isValid) return false;
       }
@@ -61,43 +61,7 @@ export class Validator {
     return true;
   }
 
-  isValidPlacement(num, row, col, board) {
-    // Verifica linha e coluna
-    for (let i = 0; i < this.gameState.SIZE; i++) {
-      if (
-        (board[row][i] === num && i !== col) ||
-        (board[i][col] === num && i !== row)
-      ) {
-        return false;
-      }
-    }
-
-    // Verifica quadrante 3x3
-    const startRow =
-      Math.floor(row / this.gameState.SUBGRID_SIZE) *
-      this.gameState.SUBGRID_SIZE;
-    const startCol =
-      Math.floor(col / this.gameState.SUBGRID_SIZE) *
-      this.gameState.SUBGRID_SIZE;
-
-    for (let i = startRow; i < startRow + this.gameState.SUBGRID_SIZE; i++) {
-      for (let j = startCol; j < startCol + this.gameState.SUBGRID_SIZE; j++) {
-        if (board[i][j] === num && i !== row && j !== col) {
-          return false;
-        }
-      }
-    }
-    return true;
-  }
-
   getCurrentBoardState() {
-    const board = this.gameState.createEmptyBoard();
-    for (let i = 0; i < this.gameState.cells.length; i++) {
-      const value = parseInt(this.gameState.cells[i].value);
-      const row = Math.floor(i / this.gameState.SIZE);
-      const col = i % this.gameState.SIZE;
-      board[row][col] = isNaN(value) ? 0 : value;
-    }
-    return board;
+    return getBoardFromCells(this.gameState.cells, this.gameState.SIZE);
   }
 }

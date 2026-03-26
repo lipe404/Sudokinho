@@ -12,6 +12,8 @@ const STATIC_CACHE_URLS = [
   './style.css',
   './js/main.js',
   './js/workers/sudokuWorker.js',
+  './js/core/SudokuCore.js',
+  './js/core/BoardUtils.js',
   './js/game/GameController.js',
   './js/game/GameState.js',
   './js/game/SudokuGenerator.js',

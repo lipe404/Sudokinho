@@ -1,4 +1,5 @@
 import { Validator } from "../utils/Validator.js";
+import { getBoardFromCells } from "../core/BoardUtils.js";
 
 export class GridManager {
   constructor(gameState) {
@@ -201,9 +202,13 @@ export class GridManager {
         } else {
           this.clearHighlights();
         }
+      if (this.gameState && typeof this.gameState.emit === 'function') {
+        this.gameState.emit('boardChange', this.getCurrentBoardState());
+      }
       }
     } catch (error) {
       console.error('Erro ao validar input da célula:', error);
+    }
     }
   }
 
@@ -339,14 +344,7 @@ export class GridManager {
   }
 
   getCurrentBoardState() {
-    const board = this.gameState.createEmptyBoard();
-    for (let i = 0; i < this.gameState.cells.length; i++) {
-      const value = parseInt(this.gameState.cells[i].value);
-      const row = Math.floor(i / this.gameState.SIZE);
-      const col = i % this.gameState.SIZE;
-      board[row][col] = isNaN(value) ? 0 : value;
-    }
-    return board;
+    return getBoardFromCells(this.gameState.cells, this.gameState.SIZE);
   }
 
   updateCellsFromBoard(board) {

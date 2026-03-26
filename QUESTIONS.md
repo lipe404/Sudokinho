@@ -15,19 +15,6 @@ Este arquivo reúne perguntas e pontos de atenção técnicos para orientar deci
 - Há metas de acessibilidade (WCAG AA), tamanho de bundle e tempo de carregamento a cumprir?
   Resposta: As mais acessiveis e perfomaticas possíveis
 
-## Arquitetura e Modularização
-
-- Consolidação de validações: podemos extrair a lógica de validação “isValidPlacement” para um módulo único compartilhado entre gerador, validador e UI, evitando duplicação em [SudokuGenerator.js](file:///c:/Users/toled/Documents/GitHub/Sudokinho/js/game/SudokuGenerator.js#L73-L100) e [Validator.js](file:///c:/Users/toled/Documents/GitHub/Sudokinho/js/utils/Validator.js#L64-L91)?
-  Resposta: Sim
-- O [Validator](file:///c:/Users/toled/Documents/GitHub/Sudokinho/js/utils/Validator.js#L1-L7) precisa realmente instanciar `ModalManager` se não exibe modais? Removemos essa dependência para reduzir acoplamento?
-  Resposta: Sim
-- Devemos mover funções de leitura do tabuleiro (“getCurrentBoardState”) para um util único para evitar duplicação em [GridManager](file:///c:/Users/toled/Documents/GitHub/Sudokinho/js/ui/GridManager.js#L313-L322), [SudokuGenerator](file:///c:/Users/toled/Documents/GitHub/Sudokinho/js/game/SudokuGenerator.js#L142-L151) e [Validator](file:///c:/Users/toled/Documents/GitHub/Sudokinho/js/utils/Validator.js#L93-L101)?
-  Resposta: Sim
-- Faz sentido introduzir um “core” (regras puras de Sudoku) sem dependência de DOM, para facilitar testes e eventualmente mover geração/validação para Web Workers?
-  Resposta: Vamos facilidar os testes para web workers ne
-- Queremos adotar um padrão de eventos/observables entre camadas (GameState ↔ UI) para reduzir chamadas diretas e facilitar testes?
-  Resposta: Sim
-
 ## Persistência e Estado
 
 - O auto‑save a cada 30s em [GameController.setupAutoSave](file:///c:/Users/toled/Documents/GitHub/Sudokinho/js/game/GameController.js#L666-L674) é agressivo o suficiente ou devemos debounçar por interação e salvar ao pausar/perder foco?
