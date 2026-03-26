@@ -73,6 +73,46 @@ export class GridManager {
       this.historyManager.saveState(currentBoard, index);
     }
 
+    // Navegação por setas entre células habilitadas
+    const moveFocus = (deltaRow, deltaCol) => {
+      const index = parseInt(cell.dataset.index);
+      const row = Math.floor(index / this.gameState.SIZE);
+      const col = index % this.gameState.SIZE;
+      let newRow = (row + deltaRow + this.gameState.SIZE) % this.gameState.SIZE;
+      let newCol = (col + deltaCol + this.gameState.SIZE) % this.gameState.SIZE;
+      for (let i = 0; i < this.gameState.SIZE * this.gameState.SIZE; i++) {
+        const targetIndex = newRow * this.gameState.SIZE + newCol;
+        const target = this.gameState.cells[targetIndex];
+        if (target && !target.disabled) {
+          target.focus();
+          return;
+        }
+        newRow = (newRow + deltaRow + this.gameState.SIZE) % this.gameState.SIZE;
+        newCol = (newCol + deltaCol + this.gameState.SIZE) % this.gameState.SIZE;
+      }
+    };
+
+    if (e.key === "ArrowLeft") {
+      e.preventDefault();
+      moveFocus(0, -1);
+      return;
+    }
+    if (e.key === "ArrowRight") {
+      e.preventDefault();
+      moveFocus(0, 1);
+      return;
+    }
+    if (e.key === "ArrowUp") {
+      e.preventDefault();
+      moveFocus(-1, 0);
+      return;
+    }
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      moveFocus(1, 0);
+      return;
+    }
+
     if (/^[1-9]$/.test(e.key)) {
       // Salvar estado antes de inserir novo valor
       if (this.historyManager && cell.value) {

@@ -28,23 +28,6 @@ Este arquivo reúne perguntas e pontos de atenção técnicos para orientar deci
 - Queremos adotar um padrão de eventos/observables entre camadas (GameState ↔ UI) para reduzir chamadas diretas e facilitar testes?
   Resposta: Sim
 
-## UI/UX e Acessibilidade
-
-- Devemos implementar “focus trap” e retorno de foco nos modais além do ESC/click‑fora? Hoje o [ModalManager](file:///c:/Users/toled/Documents/GitHub/Sudokinho/js/ui/ModalManager.js#L45-L60) não gerencia foco; incluímos roving tabindex e aria-hidden adequados?
-  Resposta: Sim, refinar e auditar
-- O anúncio acessível (`aria-live`) em [index.html](file:///c:/Users/toled/Documents/GitHub/Sudokinho/index.html#L180-L183) será usado para eventos importantes (novo jogo, dica, erro)? Quais mensagens padronizar?
-  Resposta; Auditar e padronizar tudo
-- O temporizador com id `#timer` herdou estilos de botão em [style.css](file:///c:/Users/toled/Documents/GitHub/Sudokinho/style.css#L206-L238); queremos separar a aparência para não parecer clicável?
-  Resposta: Sim,separar para nao confundir
-- Devemos adicionar navegação por setas entre células (mover foco no grid) em [GridManager.handleKeyDown](file:///c:/Users/toled/Documents/GitHub/Sudokinho/js/ui/GridManager.js#L61-L116)?
-  Resposta: Sim
-- O autoplay do áudio em [index.html](file:///c:/Users/toled/Documents/GitHub/Sudokinho/index.html#L174-L179) deve ser removido para respeitar políticas de auto‑play e evitar UX inconsistente?
-  Resposta: Sim
-- A fonte “Press Start 2P” é usada no CSS [style.css](file:///c:/Users/toled/Documents/GitHub/Sudokinho/style.css#L79-L93), mas não é carregada no HTML. Devemos incluir o link de fonte no head de [index.html](file:///c:/Users/toled/Documents/GitHub/Sudokinho/index.html#L25-L30) ou padronizar outra tipografia?
-  Resposta: Sim
-- Em realce de números, preferimos classes CSS em vez de mutações de estilo inline em [GridManager.highlightSameNumbers](file:///c:/Users/toled/Documents/GitHub/Sudokinho/js/ui/GridManager.js#L222-L245) para performance/manutenção?
-  Resposta: Sim
-
 ## Persistência e Estado
 
 - O auto‑save a cada 30s em [GameController.setupAutoSave](file:///c:/Users/toled/Documents/GitHub/Sudokinho/js/game/GameController.js#L666-L674) é agressivo o suficiente ou devemos debounçar por interação e salvar ao pausar/perder foco?

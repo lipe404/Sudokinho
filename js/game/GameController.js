@@ -220,6 +220,7 @@ export class GameController {
       this.saveCurrentGameState();
       this.gameState.animacaoAtiva = false;
       this.showDifficultyModal();
+      this.modalManager.announce('Selecione a dificuldade do novo jogo.');
     } catch (error) {
       console.error('Erro ao iniciar novo jogo:', error);
       this.showErrorModal('Erro ao iniciar novo jogo.');
@@ -450,6 +451,7 @@ export class GameController {
       if (newGameButton) {
         newGameButton.disabled = false;
       }
+      this.modalManager.announce(`Novo jogo iniciado: dificuldade ${this.gameState.currentDifficulty.name}.`);
     } catch (error) {
       console.error('Erro ao selecionar dificuldade:', error);
       this.showErrorModal('Erro ao iniciar jogo. Tente novamente.');
@@ -580,10 +582,12 @@ export class GameController {
           "O jogo foi resolvido pela máquina.",
           "info"
         );
+        this.modalManager.announce('O jogo foi resolvido automaticamente.');
         this.hideGameButtons();
         this.saveManager.clearSave(); // Limpar save após resolver
       } else {
         this.modalManager.showCustomAlert("Poxa", "Tenta de novo aí", "error");
+        this.modalManager.announce('Tabuleiro inválido ao tentar resolver.');
       }
     } catch (error) {
       console.error('Erro ao resolver Sudoku:', error);
@@ -638,6 +642,7 @@ export class GameController {
 
       this.animationManager.animateHint(cell);
       this.gameState.incrementHints();
+      this.modalManager.announce(`Dica aplicada na linha ${row + 1}, coluna ${col + 1}.`);
       
       // Auto-save após dica
       this.autoSave();
@@ -952,6 +957,7 @@ export class GameController {
 
       // Mostrar mensagem de vitória com conquistas
       this.showVictoryModal(completionData.time, newlyUnlocked);
+      this.modalManager.announce(`Você venceu! Tempo ${completionData.time}.`);
     } catch (error) {
       console.error('Erro ao processar conclusão do jogo:', error);
       // Fallback: mostrar mensagem básica
@@ -960,6 +966,7 @@ export class GameController {
         `Você completou o Sudoku corretamente em ${completionData.time}!`,
         "success"
       );
+      this.modalManager.announce(`Você venceu! Tempo ${completionData.time}.`);
     }
   }
 

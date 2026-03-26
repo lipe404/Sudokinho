@@ -211,8 +211,7 @@ h1::after {
 #undo-button,
 #redo-button,
 #play-button,
-#pause-button,
-#timer {
+#pause-button {
   font-family: "Press Start 2P", monospace;
   padding: 14px 20px;
   font-size: clamp(1rem, 4vw, 1.2rem);
@@ -243,8 +242,7 @@ h1::after {
 #undo-button:hover:not(:disabled),
 #redo-button:hover:not(:disabled),
 #play-button:hover,
-#pause-button:hover,
-#timer:hover {
+#pause-button:hover {
   box-shadow: 0 0 12px var(--primary-color);
   background-color: var(--secondary-color);
   transform: scale(1.05);
@@ -257,6 +255,19 @@ h1::after {
 }
 #pause-button {
   display: none;
+}
+/* Timer separado dos botões para não parecer clicável */
+#timer {
+  font-family: "Press Start 2P", monospace;
+  padding: 8px 12px;
+  font-size: clamp(0.9rem, 3.5vw, 1.1rem);
+  color: var(--white);
+  background: transparent;
+  border: none;
+  cursor: default;
+  box-shadow: none;
+  text-transform: none;
+  display: inline-block;
 }
 /* Modals */
 .custom-modal {
